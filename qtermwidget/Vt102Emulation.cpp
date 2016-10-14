@@ -1019,6 +1019,30 @@ void Vt102Emulation::sendKeyEvent( QKeyEvent* event )
         else if (event->key() == Qt::Key_PageDown) {
             textToSend += "\033[6~";
         }
+        else if (event->key() == Qt::Key_Up)
+        {
+            textToSend += "\020";
+        }
+        else if (event->key() == Qt::Key_Down)
+        {
+            textToSend += "\016";
+        }
+        else if (event->key() == Qt::Key_Left)
+        {
+            textToSend += "\002";
+        }
+        else if (event->key() == Qt::Key_Right)
+        {
+            textToSend += "\006";
+        }
+        else if (event->key() == Qt::Key_Home)
+        {
+            textToSend += "\001";
+        }
+        else if (event->key() == Qt::Key_End)
+        {
+            textToSend += "\005";
+        }
         else {
             textToSend += _codec->fromUnicode(event->text());
         }

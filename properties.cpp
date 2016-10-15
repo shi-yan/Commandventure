@@ -66,7 +66,7 @@ void Properties::loadSettings()
     if (!guiStyle.isNull())
         QApplication::setStyle(guiStyle);
 
-    colorScheme = m_settings->value("colorScheme", "Linux").toString();
+    colorScheme = m_settings->value("colorScheme", "DarkPastels").toString();
 
     highlightCurrentTerminal = m_settings->value("highlightCurrentTerminal", true).toBool();
 

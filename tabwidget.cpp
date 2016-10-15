@@ -52,6 +52,7 @@ TabWidget::TabWidget(QWidget* parent) : QTabWidget(parent), tabNumerator(0)
     connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(removeTab(int)));
     connect(tabBar(), SIGNAL(tabMoved(int,int)), this, SLOT(updateTabIndices()));
     connect(this, SIGNAL(tabRenameRequested(int)), this, SLOT(renameSession(int)));
+
 }
 
 TermWidgetHolder * TabWidget::terminalHolder()

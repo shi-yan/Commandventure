@@ -101,6 +101,8 @@ MainWindow::MainWindow(const QString& work_dir,
        the main window; otherwise, the initial prompt might
        get jumbled because of changes in internal geometry. */
     consoleTabulator->addNewTab(command);
+
+    m_menuBar->setNativeMenuBar(true);
 }
 
 MainWindow::~MainWindow()
@@ -533,7 +535,7 @@ void MainWindow::setupCustomDirs()
 {
     const QSettings settings;
     const QString dir = QFileInfo(settings.fileName()).canonicalPath() + "/color-schemes/";
-    TermWidgetImpl::addCustomColorSchemeDir(dir);
+    TermWidgetImpl::addCustomColorSchemeDir("/home/shiy/Micemallow/qtermwidget/color-schemes");
 }
 
 void MainWindow::on_consoleTabulator_currentChanged(int)

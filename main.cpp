@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
     darkPalette.setColor(QPalette::Light, QColor(53,53,53));
     darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
     darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-
+    darkPalette.setColor(QPalette::Midlight,  QColor(42, 80, 130));
 
     qApp->setPalette(darkPalette);
 

@@ -31,8 +31,9 @@
 #include "KeyboardTranslator.h"
 #include "ColorScheme.h"
 #include "SearchBar.h"
+#include "StatusBar.h"
 #include "qtermwidget.h"
-
+#include <QProcess>
 
 #define STEP_ZOOM 1
 
@@ -246,6 +247,9 @@ void QTermWidget::init(int startnow)
     m_layout->setMargin(0);
     setLayout(m_layout);
 
+    setAutoFillBackground(true);
+    m_layout->setSpacing(0);
+
     m_impl = new TermWidgetImpl(this);
     m_impl->m_terminalDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     m_layout->addWidget(m_impl->m_terminalDisplay);
@@ -268,6 +272,12 @@ void QTermWidget::init(int startnow)
     connect(m_searchBar, SIGNAL(findPrevious()), this, SLOT(findPrevious()));
     m_layout->addWidget(m_searchBar);
     m_searchBar->hide();
+
+    m_statusBar = new StatusBar(this);
+    m_statusBar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
+    m_layout->addWidget(m_statusBar);
+
+    connect(m_statusBar, SIGNAL(openCurrentLocation()), this, SLOT(onOpenCurrentLocation()));
 
     if (startnow && m_impl->m_session) {
         m_impl->m_session->run();
@@ -475,7 +485,7 @@ void QTermWidget::sendText(const QString &text)
 
 void QTermWidget::resizeEvent(QResizeEvent*)
 {
-//qDebug("global window resizing...with %d %d", this->size().width(), this->size().height());
+    //qDebug("global window resizing...with %d %d", this->size().width(), this->size().height());
     m_impl->m_terminalDisplay->resize(this->size());
 }
 
@@ -674,4 +684,79 @@ QString QTermWidget::icon() const
 bool QTermWidget::isTitleChanged() const
 {
     return m_impl->m_session->isTitleChanged();
+}
+
+static QString substituteFileBrowserParameters(const QString &pre, const QString &file)
+{
+    QString cmd;
+    for (int i = 0; i < pre.size(); ++i) {
+        QChar c = pre.at(i);
+        if (c == QLatin1Char('%') && i < pre.size()-1) {
+            c = pre.at(++i);
+            QString s;
+            if (c == QLatin1Char('d'))
+                s = QLatin1Char('"') + file + QLatin1Char('"');
+            else if (c == QLatin1Char('f'))
+                s = QLatin1Char('"') + file + QLatin1Char('"');
+            else if (c == QLatin1Char('n'))
+                s = QLatin1Char('"') + QFileInfo(file).fileName() + QLatin1Char('"');
+            else if (c == QLatin1Char('%'))
+                s = c;
+            else {
+                s = QLatin1Char('%');
+                s += c;
+            }
+            cmd += s;
+            continue;
+        }
+        cmd += c;
+    }
+    return cmd;
+}
+
+void QTermWidget::showInGraphicalShell(QString &pathIn)
+{
+    // Mac, Windows support folder or file.
+#if defined(Q_OS_WIN)
+    QString param;
+    if (!QFileInfo(pathIn).isDir())
+        param = QLatin1String("/select,");
+    param += QDir::toNativeSeparators(pathIn);
+    QProcess::startDetached(QString("explorer.exe"), QStringList(param));
+#elif defined(Q_OS_MAC)
+    QStringList scriptArgs;
+    scriptArgs << QLatin1String("-e")
+               << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"")
+                                     .arg(pathIn);
+    QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
+    scriptArgs.clear();
+    scriptArgs << QLatin1String("-e")
+               << QLatin1String("tell application \"Finder\" to activate");
+    QProcess::execute("/usr/bin/osascript", scriptArgs);
+#else
+
+    if (pathIn.startsWith('~'))
+    {
+        pathIn.replace(0, 1, QDir::homePath());
+    }
+
+    const QDir dir(pathIn);
+    const QString folder = dir.absolutePath();
+    qDebug() << "folder" << folder;
+    QString app = QLatin1String("xdg-open %d");
+
+    QProcess browserProc;
+    const QString browserArgs = substituteFileBrowserParameters(app, folder);
+    bool success = browserProc.startDetached(browserArgs);
+    const QString error = QString::fromLocal8Bit(browserProc.readAllStandardError());
+    success = success && error.isEmpty();
+
+#endif
+}
+
+void QTermWidget::onOpenCurrentLocation()
+{
+    QString path = m_impl->m_session->getCurrentPath();
+
+    showInGraphicalShell(path);
 }

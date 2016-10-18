@@ -190,7 +190,7 @@ void TermWidget::propertiesChanged()
 
 void TermWidget::term_termGetFocus()
 {
-    m_border = palette().color(QPalette::Highlight);
+    m_border = palette().color(QPalette::Midlight);
     emit termGetFocus(this);
     update();
 }
@@ -201,7 +201,7 @@ void TermWidget::term_termLostFocus()
     update();
 }
 
-void TermWidget::paintEvent (QPaintEvent *)
+void TermWidget::paintEvent (QPaintEvent *event)
 {
     QPainter p(this);
     QPen pen(m_border);
@@ -209,4 +209,6 @@ void TermWidget::paintEvent (QPaintEvent *)
     pen.setBrush(m_border);
     p.setPen(pen);
     p.drawRect(0, 0, width()-1, height()-1);
+
+    QWidget::paintEvent(event);
 }

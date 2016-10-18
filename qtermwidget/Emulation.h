@@ -267,7 +267,7 @@ public slots:
   void receiveData(const char* buffer,int len);
 
 signals:
-
+    void metaDataChanged(const QString metaData);
   /**
    * Emitted when a buffer of data is ready to send to the
    * standard input of the terminal.

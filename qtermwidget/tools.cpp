@@ -4,7 +4,7 @@
 #include <QDir>
 #include <QtDebug>
 
-#define KB_LAYOUT_DIR "/home"
+#define KB_LAYOUT_DIR "/usr/local/share/qtermwidget5/kb-layouts"
 #define COLORSCHEMES_DIR "/home"
 
 /*! Helper function to get possible location of layout files.

@@ -49,7 +49,8 @@ SOURCES += main.cpp\
     qtermwidget/TerminalCharacterDecoder.cpp \
     qtermwidget/TerminalDisplay.cpp \
     qtermwidget/tools.cpp \
-    qtermwidget/Vt102Emulation.cpp
+    qtermwidget/Vt102Emulation.cpp \
+    qtermwidget/StatusBar.cpp
 
 HEADERS  += mainwindow.h \
     bookmarkswidget.h \
@@ -92,7 +93,8 @@ HEADERS  += mainwindow.h \
     qtermwidget/TerminalCharacterDecoder.h \
     qtermwidget/TerminalDisplay.h \
     qtermwidget/tools.h \
-    qtermwidget/Vt102Emulation.h
+    qtermwidget/Vt102Emulation.h \
+    qtermwidget/StatusBar.h
 
 RESOURCES += \
     icons.qrc
@@ -108,6 +110,7 @@ FORMS += \
     forms/bookmarkswidget.ui \
     forms/fontdialog.ui \
     forms/propertiesdialog.ui \
-    forms/qterminal.ui
+    forms/qterminal.ui \
+    qtermwidget/StatusBar.ui
 
 LIBS += -lX11

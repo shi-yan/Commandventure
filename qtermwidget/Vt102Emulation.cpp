@@ -53,7 +53,7 @@
 // Konsole
 #include "KeyboardTranslator.h"
 #include "Screen.h"
-
+#include <QDebug>
 
 using namespace Konsole;
 
@@ -400,14 +400,18 @@ void Vt102Emulation::processWindowAttributeChange()
   for (int j = 0; j < tokenBufferPos-i-2; j++)
     newValue[j] = tokenBuffer[i+1+j];
 
+  qDebug() << "window attribute" << newValue;
+
   _pendingTitleUpdates[attributeToChange] = newValue;
   _titleUpdateTimer->start(20);
+  emit metaDataChanged(newValue);
 }
 
 void Vt102Emulation::updateTitle()
 {
     QListIterator<int> iter( _pendingTitleUpdates.keys() );
-    while (iter.hasNext()) {
+    while (iter.hasNext())
+    {
         int arg = iter.next();
         emit titleChanged( arg , _pendingTitleUpdates[arg] );
     }
@@ -1019,7 +1023,11 @@ void Vt102Emulation::sendKeyEvent( QKeyEvent* event )
         else if (event->key() == Qt::Key_PageDown) {
             textToSend += "\033[6~";
         }
-        else if (event->key() == Qt::Key_Up)
+        else if (event->key() == Qt::Key_Left)
+        {
+            textToSend += (char) 0x8B;
+        }
+     /*   else if (event->key() == Qt::Key_Up)
         {
             textToSend += "\020";
         }
@@ -1042,8 +1050,9 @@ void Vt102Emulation::sendKeyEvent( QKeyEvent* event )
         else if (event->key() == Qt::Key_End)
         {
             textToSend += "\005";
-        }
+        }*/
         else {
+            qDebug() << "event text" << event->text();
             textToSend += _codec->fromUnicode(event->text());
         }
 

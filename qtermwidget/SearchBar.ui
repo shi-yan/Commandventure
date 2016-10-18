@@ -7,13 +7,28 @@
     <x>0</x>
     <y>0</y>
     <width>399</width>
-    <height>40</height>
+    <height>41</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>SearchBar</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QToolButton" name="closeButton">
      <property name="text">
@@ -21,8 +36,7 @@
      </property>
      <property name="icon">
       <iconset theme="dialog-close">
-       <normaloff/>
-      </iconset>
+       <normaloff>.</normaloff>.</iconset>
      </property>
     </widget>
    </item>
@@ -43,8 +57,7 @@
      </property>
      <property name="icon">
       <iconset theme="go-previous">
-       <normaloff/>
-      </iconset>
+       <normaloff>.</normaloff>.</iconset>
      </property>
     </widget>
    </item>
@@ -55,8 +68,7 @@
      </property>
      <property name="icon">
       <iconset theme="go-next">
-       <normaloff/>
-      </iconset>
+       <normaloff>.</normaloff>.</iconset>
      </property>
     </widget>
    </item>
@@ -67,8 +79,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff/>
-      </iconset>
+       <normaloff>.</normaloff>.</iconset>
      </property>
      <property name="popupMode">
       <enum>QToolButton::InstantPopup</enum>

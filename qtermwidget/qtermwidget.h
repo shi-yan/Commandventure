@@ -26,6 +26,7 @@
 class QVBoxLayout;
 struct TermWidgetImpl;
 class SearchBar;
+class StatusBar;
 class QUrl;
 
 class QTermWidget : public QWidget {
@@ -276,13 +277,16 @@ private slots:
     void findPrevious();
     void matchFound(int startColumn, int startLine, int endColumn, int endLine);
     void noMatchFound();
+    void onOpenCurrentLocation();
 
 private:
     void search(bool forwards, bool next);
     void setZoom(int step);
     void init(int startnow);
+    void showInGraphicalShell(QString &pathIn);
     TermWidgetImpl * m_impl;
     SearchBar* m_searchBar;
+    StatusBar *m_statusBar;
     QVBoxLayout *m_layout;
 };
 

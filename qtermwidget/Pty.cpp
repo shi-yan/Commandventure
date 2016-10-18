@@ -54,6 +54,7 @@ void Pty::setWindowSize(int lines, int cols)
   if (pty()->masterFd() >= 0)
     pty()->setWinSize(lines, cols);
 }
+
 QSize Pty::windowSize() const
 {
     return QSize(_windowColumns,_windowLines);
@@ -75,6 +76,7 @@ void Pty::setFlowControlEnabled(bool enable)
       qWarning() << "Unable to set terminal attributes.";
   }
 }
+
 bool Pty::flowControlEnabled() const
 {
     if (pty()->masterFd() >= 0)
@@ -255,11 +257,13 @@ Pty::Pty(int masterFd, QObject* parent)
 {
     init();
 }
+
 Pty::Pty(QObject* parent)
     : KPtyProcess(parent)
 {
     init();
 }
+
 void Pty::init()
 {
   _windowColumns = 0;
@@ -290,8 +294,8 @@ void Pty::sendData(const char* data, int length)
 
 void Pty::dataReceived()
 {
-     QByteArray data = pty()->readAll();
-    emit receivedData(data.constData(),data.count());
+   QByteArray data = pty()->readAll();
+   emit receivedData(data.constData(),data.count());
 }
 
 void Pty::lockPty(bool lock)

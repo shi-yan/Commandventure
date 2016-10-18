@@ -37,6 +37,7 @@
 #include <QStringList>
 #include <QFile>
 #include <QtDebug>
+#include <QRegularExpression>
 
 #include "Pty.h"
 //#include "kptyprocess.h"
@@ -70,7 +71,11 @@ Session::Session(QObject* parent) :
 //   , _zmodemBusy(false)
 //   , _zmodemProc(0)
 //   , _zmodemProgress(0)
-        , _hasDarkBackground(false)
+        , _hasDarkBackground(false),
+        _username(),
+        _hostname(),
+        _currentPath(),
+        _exp("^(.+)@(.+):\\s(.+)$")
 {
     //prepare DBus communication
 //    new SessionAdaptor(this);
@@ -99,6 +104,8 @@ Session::Session(QObject* parent) :
             this, SLOT(onEmulationSizeChange(QSize)));
     connect(_emulation, SIGNAL(imageSizeChanged(int, int)),
             this, SLOT(onViewSizeChange(int, int)));
+
+    connect(_emulation, SIGNAL(metaDataChanged(QString)), this, SLOT(onEmulationMetaDataChanged(QString)));
 
     //connect teletype to emulation backend
     _shellProcess->setUtf8Mode(_emulation->utf8());
@@ -478,6 +485,7 @@ void Session::onViewSizeChange(int /*height*/, int /*width*/)
 {
     updateTerminalSize();
 }
+
 void Session::onEmulationSizeChange(QSize size)
 {
     setSize(size);
@@ -721,6 +729,7 @@ bool Session::isMonitorActivity() const
 {
     return _monitorActivity;
 }
+
 // unused currently
 bool Session::isMonitorSilence()  const
 {
@@ -778,10 +787,12 @@ void Session::setFlowControlEnabled(bool enabled)
 
     emit flowControlEnabledChanged(enabled);
 }
+
 bool Session::flowControlEnabled() const
 {
     return _flowControl;
 }
+
 //void Session::fireZModemDetected()
 //{
 //  if (!_zmodemBusy)
@@ -895,8 +906,10 @@ void Session::zmodemFinished()
   }
 }
 */
+
 void Session::onReceiveBlock( const char * buf, int len )
 {
+    qDebug() << "received block:" << buf;
     _emulation->receiveData( buf, len );
     emit receivedData( QString::fromLatin1( buf, len ) );
 }
@@ -914,36 +927,67 @@ void Session::setSize(const QSize & size)
 
     emit resizeRequest(size);
 }
+
 int Session::foregroundProcessId() const
 {
     return _shellProcess->foregroundProcessGroup();
 }
+
 int Session::processId() const
 {
     return _shellProcess->pid();
 }
+
 int Session::getPtySlaveFd() const
 {
     return ptySlaveFd;
+}
+
+void Session::onEmulationMetaDataChanged(const QString meta)
+{
+    qDebug() << "Session meta" << meta;
+    parseMetaData(meta, _username, _hostname, _currentPath);
+}
+
+void Session::parseMetaData(const QString &meta, QString &username, QString &hostname, QString &path)
+{
+    QRegularExpressionMatch match = _exp.match(meta);
+
+    if(match.hasMatch())
+    {
+        qDebug() << match.captured(0);
+        username = match.captured(1);
+        hostname = match.captured(2);
+        path = match.captured(3);
+    }
+}
+
+const QString &Session::getCurrentPath()
+{
+    return _currentPath;
 }
 
 SessionGroup::SessionGroup()
         : _masterMode(0)
 {
 }
+
 SessionGroup::~SessionGroup()
 {
     // disconnect all
     connectAll(false);
 }
+
 int SessionGroup::masterMode() const
 {
     return _masterMode;
 }
+
 QList<Session *> SessionGroup::sessions() const
 {
     return _sessions.keys();
 }
+
 bool SessionGroup::masterStatus(Session * session) const
 {
     return _sessions[session];
@@ -959,6 +1003,7 @@ void SessionGroup::addSession(Session * session)
         connectPair(masterIter.next(),session);
     }
 }
+
 void SessionGroup::removeSession(Session * session)
 {
     setMasterStatus(session,false);
@@ -971,6 +1016,7 @@ void SessionGroup::removeSession(Session * session)
 
     _sessions.remove(session);
 }
+
 void SessionGroup::setMasterMode(int mode)
 {
     _masterMode = mode;
@@ -978,10 +1024,12 @@ void SessionGroup::setMasterMode(int mode)
     connectAll(false);
     connectAll(true);
 }
+
 QList<Session *> SessionGroup::masters() const
 {
     return _sessions.keys(true);
 }
+
 void SessionGroup::connectAll(bool connect)
 {
     QListIterator<Session *> masterIter(masters());
@@ -1003,6 +1051,7 @@ void SessionGroup::connectAll(bool connect)
         }
     }
 }
+
 void SessionGroup::setMasterStatus(Session * session, bool master)
 {
     bool wasMaster = _sessions[session];
@@ -1038,6 +1087,7 @@ void SessionGroup::connectPair(Session * master , Session * other)
                  SLOT(sendString(const char *,int)) );
     }
 }
+
 void SessionGroup::disconnectPair(Session * master , Session * other)
 {
 //    qDebug() << k_funcinfo;

@@ -27,7 +27,7 @@
 
 #include <QStringList>
 #include <QWidget>
-
+#include <QRegularExpression>
 #include "History.h"
 
 class KProcess;
@@ -78,6 +78,8 @@ public:
      * after run() has been called successfully.
      */
     bool isRunning() const;
+
+    const QString &getCurrentPath();
 
     /**
      * Sets the profile associated with this session.
@@ -402,6 +404,8 @@ public slots:
      */
     void setUserTitle( int, const QString & caption );
 
+    void onEmulationMetaDataChanged(const QString meta);
+
 signals:
 
     /** Emitted when the terminal process starts. */
@@ -504,6 +508,7 @@ private slots:
 private:
 
     void updateTerminalSize();
+    void parseMetaData(const QString &meta, QString &username, QString &hostname, QString &path);
     WId windowId() const;
 
     int            _uniqueIdentifier;
@@ -561,6 +566,13 @@ private:
     static int lastSessionId;
 
     int ptySlaveFd;
+
+    QString _username;
+    QString _hostname;
+    QString _currentPath;
+
+    const QRegularExpression _exp;
+
 
 };
 

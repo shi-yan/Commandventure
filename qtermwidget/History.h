@@ -101,7 +101,7 @@ public:
   virtual int  getLines() = 0;
   virtual int  getLineLen(int lineno) = 0;
   virtual void getCells(int lineno, int colno, int count, Character res[]) = 0;
-  virtual bool isWrappedLine(int lineno) = 0;
+  virtual struct LineProperty getLineProperty(int lineno) = 0;
 
   // backward compatibility (obsolete)
   Character   getCell(int lineno, int colno) { Character res; getCells(lineno,colno,1,&res); return res; }
@@ -115,7 +115,7 @@ public:
     addCells(cells.data(),cells.size());
   }
 
-  virtual void addLine(bool previousWrapped=false) = 0;
+  virtual void addLineProperty(struct LineProperty property) = 0;
 
   //
   // FIXME:  Passing around constant references to HistoryType instances
@@ -144,10 +144,10 @@ public:
   virtual int  getLines();
   virtual int  getLineLen(int lineno);
   virtual void getCells(int lineno, int colno, int count, Character res[]);
-  virtual bool isWrappedLine(int lineno);
+  virtual struct LineProperty getLineProperty(int lineno) override;
 
   virtual void addCells(const Character a[], int count);
-  virtual void addLine(bool previousWrapped=false);
+  virtual void addLineProperty(struct LineProperty property) override;
 
 private:
   int startOfLine(int lineno);
@@ -173,11 +173,11 @@ public:
   virtual int  getLines();
   virtual int  getLineLen(int lineno);
   virtual void getCells(int lineno, int colno, int count, Character res[]);
-  virtual bool isWrappedLine(int lineno);
+  virtual struct LineProperty getLineProperty(int lineno) override;
 
   virtual void addCells(const Character a[], int count);
   virtual void addCellsVector(const QVector<Character>& cells);
-  virtual void addLine(bool previousWrapped=false);
+  virtual void addLineProperty(struct LineProperty property) override;
 
   void setMaxNbLines(unsigned int nbLines);
   unsigned int maxNbLines() { return _maxLineCount; }
@@ -187,7 +187,7 @@ private:
   int bufferIndex(int lineNumber);
 
   HistoryLine* _historyBuffer;
-  QBitArray _wrappedLine;
+  QVector<struct LineProperty> _lineProperties;
   int _maxLineCount;
   int _usedLines;
   int _head;
@@ -230,10 +230,10 @@ public:
   virtual int  getLines();
   virtual int  getLineLen(int lineno);
   virtual void getCells(int lineno, int colno, int count, Character res[]);
-  virtual bool isWrappedLine(int lineno);
+  virtual struct LineProperty getLineProperty(int lineno) override;
 
   virtual void addCells(const Character a[], int count);
-  virtual void addLine(bool previousWrapped=false);
+  virtual void addLineProperty(struct LineProperty property) override;
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -248,10 +248,10 @@ public:
   virtual int  getLines();
   virtual int  getLineLen(int lineno);
   virtual void getCells(int lineno, int colno, int count, Character res[]);
-  virtual bool isWrappedLine(int lineno);
+  virtual struct LineProperty getLineProperty(int lineno);
 
   virtual void addCells(const Character a[], int count);
-  virtual void addLine(bool previousWrapped=false);
+  virtual void addLineProperty(struct LineProperty property);
 
 protected:
   BlockArray m_blockArray;
@@ -344,8 +344,8 @@ public:
 
   virtual void getCharacters(Character* array, int length, int startColumn) ;
   virtual void getCharacter(int index, Character &r) ;
-  virtual bool isWrapped() const {return wrapped;};
-  virtual void setWrapped(bool isWrapped) { wrapped=isWrapped;};
+  virtual struct LineProperty getLineProperty() const {return property;};
+  virtual void setLineProperty(struct LineProperty _property) { property=property;};
   virtual unsigned int getLength() const {return length;};
 
 protected:
@@ -354,7 +354,7 @@ protected:
   quint16 length;
   quint16* text;
   quint16 formatLength;
-  bool wrapped;
+  struct LineProperty property;
 };
 
 class CompactHistoryScroll : public HistoryScroll
@@ -368,11 +368,11 @@ public:
   virtual int  getLines();
   virtual int  getLineLen(int lineno);
   virtual void getCells(int lineno, int colno, int count, Character res[]);
-  virtual bool isWrappedLine(int lineno);
+  virtual struct LineProperty getLineProperty(int lineno);
 
   virtual void addCells(const Character a[], int count);
   virtual void addCellsVector(const TextLine& cells);
-  virtual void addLine(bool previousWrapped=false);
+  virtual void addLineProperty(struct LineProperty property);
 
   void setMaxNbLines(unsigned int nbLines);
   unsigned int maxNbLines() const { return _maxLineCount; }

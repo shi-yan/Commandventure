@@ -232,14 +232,15 @@ int HistoryScrollFile::getLineLen(int lineno)
   return (startOfLine(lineno+1) - startOfLine(lineno)) / sizeof(Character);
 }
 
-bool HistoryScrollFile::isWrappedLine(int lineno)
+struct LineProperty HistoryScrollFile::getLineProperty(int lineno)
 {
   if (lineno>=0 && lineno <= getLines()) {
-    unsigned char flag;
-    lineflags.get((unsigned char*)&flag,sizeof(unsigned char),(lineno)*sizeof(unsigned char));
-    return flag;
+    unsigned int flag[2];
+    lineflags.get((unsigned char*)flag,sizeof(unsigned int)*2,(lineno)*sizeof(unsigned int) *2);
+    struct LineProperty property = {flag[0], flag[1]};
+    return property;
   }
-  return false;
+  return {0,LINE_DEFAULT};
 }
 
 int HistoryScrollFile::startOfLine(int lineno)
@@ -268,15 +269,18 @@ void HistoryScrollFile::addCells(const Character text[], int count)
   cells.add((unsigned char*)text,count*sizeof(Character));
 }
 
-void HistoryScrollFile::addLine(bool previousWrapped)
+void HistoryScrollFile::addLineProperty(struct LineProperty property)
 {
   if (index.isMapped())
           index.unmap();
 
   int locn = cells.len();
   index.add((unsigned char*)&locn,sizeof(int));
-  unsigned char flags = previousWrapped ? 0x01 : 0x00;
-  lineflags.add((unsigned char*)&flags,sizeof(unsigned char));
+
+  unsigned int flags[2] = {0};
+  flags[0] = property.commandCount;
+  flags[0] = property.property ? 0x01 : 0x00;
+  lineflags.add((unsigned char*)flags,sizeof(unsigned int) * 2);
 }
 
 
@@ -308,8 +312,9 @@ void HistoryScrollBuffer::addCellsVector(const QVector<Character>& cells)
     }
 
     _historyBuffer[bufferIndex(_usedLines-1)] = cells;
-    _wrappedLine[bufferIndex(_usedLines-1)] = false;
+    _lineProperties[bufferIndex(_usedLines-1)] = {0, LINE_DEFAULT};
 }
+
 void HistoryScrollBuffer::addCells(const Character a[], int count)
 {
   HistoryLine newLine(count);
@@ -318,9 +323,9 @@ void HistoryScrollBuffer::addCells(const Character a[], int count)
   addCellsVector(newLine);
 }
 
-void HistoryScrollBuffer::addLine(bool previousWrapped)
+void HistoryScrollBuffer::addLineProperty(struct LineProperty property)
 {
-    _wrappedLine[bufferIndex(_usedLines-1)] = previousWrapped;
+    _lineProperties[bufferIndex(_usedLines-1)] = property;
 }
 
 int HistoryScrollBuffer::getLines()
@@ -342,17 +347,17 @@ int HistoryScrollBuffer::getLineLen(int lineNumber)
   }
 }
 
-bool HistoryScrollBuffer::isWrappedLine(int lineNumber)
+struct LineProperty HistoryScrollBuffer::getLineProperty(int lineNumber)
 {
   Q_ASSERT( lineNumber >= 0 && lineNumber < _maxLineCount );
 
   if (lineNumber < _usedLines)
   {
     //kDebug() << "Line" << lineNumber << "wrapped is" << _wrappedLine[bufferIndex(lineNumber)];
-    return _wrappedLine[bufferIndex(lineNumber)];
+    return _lineProperties[bufferIndex(lineNumber)];
   }
   else
-    return false;
+    return {0, LINE_DEFAULT};
 }
 
 void HistoryScrollBuffer::getCells(int lineNumber, int startColumn, int count, Character buffer[])
@@ -395,7 +400,7 @@ void HistoryScrollBuffer::setMaxNbLines(unsigned int lineCount)
     _historyBuffer = newBuffer;
     delete[] oldBuffer;
 
-    _wrappedLine.resize(lineCount);
+    _lineProperties.resize(lineCount);
     dynamic_cast<HistoryTypeBuffer*>(m_histType)->m_nbLines = lineCount;
 }
 
@@ -442,9 +447,9 @@ int  HistoryScrollNone::getLineLen(int)
   return 0;
 }
 
-bool HistoryScrollNone::isWrappedLine(int /*lineno*/)
+struct LineProperty HistoryScrollNone::getLineProperty(int /*lineno*/)
 {
-  return false;
+  return {0, LINE_DEFAULT};
 }
 
 void HistoryScrollNone::getCells(int, int, int, Character [])
@@ -455,7 +460,7 @@ void HistoryScrollNone::addCells(const Character [], int)
 {
 }
 
-void HistoryScrollNone::addLine(bool)
+void HistoryScrollNone::addLineProperty(struct LineProperty property)
 {
 }
 
@@ -484,9 +489,9 @@ int  HistoryScrollBlockArray::getLineLen(int lineno)
         return 0;
 }
 
-bool HistoryScrollBlockArray::isWrappedLine(int /*lineno*/)
+struct LineProperty HistoryScrollBlockArray::getLineProperty(int /*lineno*/)
 {
-  return false;
+  return {0,LINE_DEFAULT};
 }
 
 void HistoryScrollBlockArray::getCells(int lineno, int colno,
@@ -526,7 +531,7 @@ void HistoryScrollBlockArray::addCells(const Character a[], int count)
   m_lineLengths.insert(m_blockArray.getCurrent(), count);
 }
 
-void HistoryScrollBlockArray::addLine(bool)
+void HistoryScrollBlockArray::addLineProperty(struct LineProperty)
 {
 }
 
@@ -633,7 +638,7 @@ CompactHistoryLine::CompactHistoryLine ( const TextLine& line, CompactHistoryBlo
     Q_ASSERT (text!=NULL);
 
     length=line.size();
-    wrapped=false;
+    property={0, LINE_DEFAULT};
 
     // record formats and their positions in the format array
     c=line[0];
@@ -733,11 +738,11 @@ void CompactHistoryScroll::addCells ( const Character a[], int count )
   addCellsVector ( newLine );
 }
 
-void CompactHistoryScroll::addLine ( bool previousWrapped )
+void CompactHistoryScroll::addLineProperty( struct LineProperty property )
 {
   CompactHistoryLine *line = lines.last();
   //kDebug() << "last line at address " << line;
-  line->setWrapped(previousWrapped);
+  line->setLineProperty(property);
 }
 
 int CompactHistoryScroll::getLines()
@@ -774,10 +779,10 @@ void CompactHistoryScroll::setMaxNbLines ( unsigned int lineCount )
   //kDebug() << "set max lines to: " << _maxLineCount;
 }
 
-bool CompactHistoryScroll::isWrappedLine ( int lineNumber )
+struct LineProperty CompactHistoryScroll::getLineProperty(  int lineNumber )
 {
   Q_ASSERT ( lineNumber < lines.size() );
-  return lines[lineNumber]->isWrapped();
+  return lines[lineNumber]->getLineProperty();
 }
 
 
@@ -882,14 +887,14 @@ HistoryScroll* HistoryTypeBuffer::scroll(HistoryScroll *old) const
           Character *tmp_line = new Character[size];
           old->getCells(i, 0, size, tmp_line);
           newScroll->addCells(tmp_line, size);
-          newScroll->addLine(old->isWrappedLine(i));
+          newScroll->addLineProperty(old->getLineProperty(i));
           delete [] tmp_line;
        }
        else
        {
           old->getCells(i, 0, size, line);
           newScroll->addCells(line, size);
-          newScroll->addLine(old->isWrappedLine(i));
+          newScroll->addLineProperty(old->getLineProperty(i));
        }
     }
     delete old;
@@ -932,14 +937,14 @@ HistoryScroll* HistoryTypeFile::scroll(HistoryScroll *old) const
         Character *tmp_line = new Character[size];
         old->getCells(i, 0, size, tmp_line);
         newScroll->addCells(tmp_line, size);
-        newScroll->addLine(old->isWrappedLine(i));
+        newScroll->addLineProperty(old->getLineProperty(i));
         delete [] tmp_line;
      }
      else
      {
         old->getCells(i, 0, size, line);
         newScroll->addCells(line, size);
-        newScroll->addLine(old->isWrappedLine(i));
+        newScroll->addLineProperty(old->getLineProperty(i));
      }
   }
 

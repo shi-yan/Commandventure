@@ -23,6 +23,7 @@
 
 #include <QAction>
 
+class TermWidgetHolder;
 
 class TermWidgetImpl : public QTermWidget
 {
@@ -57,9 +58,10 @@ class TermWidget : public QWidget
     TermWidgetImpl * m_term;
     QVBoxLayout * m_layout;
     QColor m_border;
+    TermWidgetHolder *m_holder;
 
     public:
-        TermWidget(const QString & wdir, const QString & shell=QString(), QWidget * parent=0);
+        TermWidget(const QString & wdir, TermWidgetHolder* holder, const QString & shell=QString(),  QWidget * parent=0);
 
         void propertiesChanged(); 
         QStringList availableKeyBindings() { return m_term->availableKeyBindings(); }
@@ -84,6 +86,7 @@ class TermWidget : public QWidget
     private slots:
         void term_termGetFocus();
         void term_termLostFocus();
+        bool hasSiblings();
 };
 
 #endif

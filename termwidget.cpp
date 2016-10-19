@@ -25,12 +25,14 @@
 #include "config.h"
 #include "properties.h"
 #include "mainwindow.h"
+#include "termwidgetholder.h"
 
 static int TermWidgetCount = 0;
 
 
-TermWidgetImpl::TermWidgetImpl(const QString & wdir, const QString & shell, QWidget * parent)
+TermWidgetImpl::TermWidgetImpl(const QString & wdir, const QString & shell,  QWidget * parent)
     : QTermWidget(0, parent)
+
 {
     TermWidgetCount++;
     QString name("TermWidget_%1");
@@ -158,8 +160,9 @@ void TermWidgetImpl::activateUrl(const QUrl & url) {
     }
 }
 
-TermWidget::TermWidget(const QString & wdir, const QString & shell, QWidget * parent)
-    : QWidget(parent)
+TermWidget::TermWidget(const QString & wdir,TermWidgetHolder *holder,  const QString & shell, QWidget * parent)
+    : QWidget(parent),
+        m_holder(holder)
 {
     m_border = palette().color(QPalette::Window);
     m_term = new TermWidgetImpl(wdir, shell, this);
@@ -201,12 +204,28 @@ void TermWidget::term_termLostFocus()
     update();
 }
 
+bool TermWidget::hasSiblings()
+{
+    if (m_holder)
+    return !(m_holder->terminalCount() == 1);
+    else
+    return false;
+}
+
 void TermWidget::paintEvent (QPaintEvent *event)
 {
     QPainter p(this);
-    QPen pen(m_border);
+
+    QColor brush = m_border;
+
+    if (!hasSiblings())
+    {
+        brush = palette().color(QPalette::Window);
+    }
+
+    QPen pen(brush);
     pen.setWidth(30);
-    pen.setBrush(m_border);
+    pen.setBrush(brush);
     p.setPen(pen);
     p.drawRect(0, 0, width()-1, height()-1);
 

@@ -51,6 +51,8 @@ class TermWidgetHolder : public QWidget
 
         TermWidget* currentTerminal();
 
+        unsigned int terminalCount();
+
     public slots:
         void splitHorizontal(TermWidget * term);
         void splitVertical(TermWidget * term);
@@ -71,6 +73,7 @@ class TermWidgetHolder : public QWidget
         QString m_wdir;
         QString m_shell;
         TermWidget * m_currentTerm;
+        unsigned int m_terminalCount;
 
         void split(TermWidget * term, Qt::Orientation orientation);
         TermWidget * newTerm(const QString & wdir=QString(), const QString & shell=QString());

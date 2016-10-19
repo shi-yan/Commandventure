@@ -836,7 +836,7 @@ int Screen::getCursorY() const
 
 void Screen::clearImage(int loca, int loce, char c)
 {
-    qDebug() << "clear image" << loca << loce << c;
+    //qDebug() << "clear image" << loca << loce << c;
     int scr_TL=loc(0,history->getLines());
     //FIXME: check positions
 

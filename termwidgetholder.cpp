@@ -30,7 +30,8 @@ TermWidgetHolder::TermWidgetHolder(const QString & wdir, const QString & shell, 
     : QWidget(parent),
       m_wdir(wdir),
       m_shell(shell),
-      m_currentTerm(0)
+      m_currentTerm(0),
+      m_terminalCount(0)
 {
     setFocusPolicy(Qt::NoFocus);
     QGridLayout * lay = new QGridLayout(this);
@@ -198,6 +199,7 @@ void TermWidgetHolder::splitCollapse(TermWidget * term)
     QSplitter * parent = qobject_cast<QSplitter*>(term->parent());
     assert(parent);
     term->setParent(0);
+    m_terminalCount--;
     delete term;
 
     QWidget *nextFocus = Q_NULLPTR;
@@ -286,7 +288,7 @@ TermWidget *TermWidgetHolder::newTerm(const QString & wdir, const QString & shel
     if (shell.isEmpty())
         sh = m_shell;
 
-    TermWidget *w = new TermWidget(wd, sh, this);
+    TermWidget *w = new TermWidget(wd, this, sh, this);
     // proxy signals
     connect(w, SIGNAL(renameSession()), this, SIGNAL(renameSession()));
     connect(w, SIGNAL(removeCurrentSession()), this, SIGNAL(lastTerminalClosed()));
@@ -302,6 +304,8 @@ TermWidget *TermWidgetHolder::newTerm(const QString & wdir, const QString & shel
     connect(w, SIGNAL(termGetFocus(TermWidget *)),
             this, SLOT(setCurrentTerminal(TermWidget *)));
     connect(w, &TermWidget::termTitleChanged, this, &TermWidgetHolder::onTermTitleChanged);
+
+    m_terminalCount++;
 
     return w;
 }
@@ -338,4 +342,9 @@ void TermWidgetHolder::onTermTitleChanged(QString title, QString icon) const
     TermWidget * term = qobject_cast<TermWidget *>(sender());
     if (m_currentTerm == term)
         emit termTitleChanged(title, icon);
+}
+
+unsigned int TermWidgetHolder::terminalCount()
+{
+    return m_terminalCount;
 }

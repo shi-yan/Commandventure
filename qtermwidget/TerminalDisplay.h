@@ -721,6 +721,7 @@ private:
 
     int _imageSize;
     QVector<LineProperty> _lineProperties;
+    QVector<LineProperty> _oldLineProperties;
 
     ColorEntry _colorTable[TABLE_COLORS];
     uint _randomSeed;

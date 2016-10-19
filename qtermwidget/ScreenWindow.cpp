@@ -39,10 +39,12 @@ ScreenWindow::ScreenWindow(QObject* parent)
     , _scrollCount(0)
 {
 }
+
 ScreenWindow::~ScreenWindow()
 {
     delete[] _windowBuffer;
 }
+
 void ScreenWindow::setScreen(Screen* screen)
 {
     Q_ASSERT( screen );
@@ -70,8 +72,8 @@ Character* ScreenWindow::getImage()
      if (!_bufferNeedsUpdate)
         return _windowBuffer;
 
-    _screen->getImage(_windowBuffer,size,
-                      currentLine(),endWindowLine());
+    _screen->getImage(_windowBuffer, size,
+                      currentLine(), endWindowLine());
 
     // this window may look beyond the end of the screen, in which
     // case there will be an unused area which needs to be filled

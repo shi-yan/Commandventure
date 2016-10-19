@@ -152,6 +152,7 @@ const ColorEntry* TerminalDisplay::colorTable() const
 {
   return _colorTable;
 }
+
 void TerminalDisplay::setBackgroundColor(const QColor& color)
 {
     _colorTable[DEFAULT_BACK_COLOR].color = color;
@@ -555,10 +556,12 @@ void TerminalDisplay::setKeyboardCursorShape(QTermWidget::KeyboardCursorShape sh
 {
     _cursorShape = shape;
 }
+
 QTermWidget::KeyboardCursorShape TerminalDisplay::keyboardCursorShape() const
 {
     return _cursorShape;
 }
+
 void TerminalDisplay::setKeyboardCursorColor(bool useForegroundColor, const QColor& color)
 {
     if (useForegroundColor)
@@ -570,6 +573,7 @@ void TerminalDisplay::setKeyboardCursorColor(bool useForegroundColor, const QCol
     else
         _cursorColor = color;
 }
+
 QColor TerminalDisplay::keyboardCursorColor() const
 {
     return _cursorColor;
@@ -1011,14 +1015,15 @@ void TerminalDisplay::updateImage()
     // its cell boundaries
     memset(dirtyMask, 0, columnsToUpdate+2);
 
+    bool hasMarkedDirty = false;
     for( x = 0 ; x < columnsToUpdate ; ++x)
     {
         if ( newLine[x] != currentLine[x] )
         {
+            hasMarkedDirty = true;
             dirtyMask[x] = true;
         }
     }
-    dirtyMask[0] = true;
 
     if (!_resizing) // not while _resizing, we're expecting a paintEvent
     for (x = 0; x < columnsToUpdate; ++x)
@@ -1083,6 +1088,17 @@ void TerminalDisplay::updateImage()
     //drawn.
     if (_lineProperties.count() > y)
         updateLine |= (_lineProperties[y].property & LINE_DOUBLEHEIGHT);
+
+    if (_oldLineProperties[y].commandCount != _lineProperties[y].commandCount
+            || _oldLineProperties[y].property != _lineProperties[y].property)
+    {
+        //qDebug() << "oldline";
+        _oldLineProperties[y] = _lineProperties[y];
+        if (!hasMarkedDirty)
+        {
+            updateLine = true;
+        }
+    }
 
     // if the characters on the line are different in the old and the new _image
     // then this line must be repainted.
@@ -1213,6 +1229,7 @@ void TerminalDisplay::focusOutEvent(QFocusEvent*)
 
     _blinkTimer->stop();
 }
+
 void TerminalDisplay::focusInEvent(QFocusEvent*)
 {
     emit termGetFocus();
@@ -1234,7 +1251,13 @@ void TerminalDisplay::paintEvent( QPaintEvent* pe )
   {
     drawBackground(paint,rect,palette().background().color(),
                     true /* use opacity setting */);
+
+
+
     drawContents(paint, rect);
+    /*paint.setPen(QColor(Qt::red));
+    paint.drawRect(rect);*/
+    qDebug() << "repaint rect" << rect;
   }
   drawInputMethodPreeditString(paint,preeditRect());
   paintFilters(paint);
@@ -2286,7 +2309,14 @@ void TerminalDisplay::updateLineProperties()
     if ( !_screenWindow )
         return;
 
+    _oldLineProperties = _lineProperties;
+
     _lineProperties = _screenWindow->getLineProperties();
+
+    if (_oldLineProperties.size() != _lineProperties.size())
+    {
+        _oldLineProperties.resize(_lineProperties.size());
+    }
 }
 
 void TerminalDisplay::mouseDoubleClickEvent(QMouseEvent* ev)

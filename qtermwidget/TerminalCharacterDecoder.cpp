@@ -66,8 +66,7 @@ QList<int> PlainTextDecoder::linePositions() const
 {
     return _linePositions;
 }
-void PlainTextDecoder::decodeLine(const Character* const characters, int count, LineProperty /*properties*/
-                             )
+void PlainTextDecoder::decodeLine(const Character* const characters, int count, unsigned char property /*properties*/        )
 {
     Q_ASSERT( _output );
 

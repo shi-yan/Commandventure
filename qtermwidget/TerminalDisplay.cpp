@@ -983,8 +983,10 @@ void TerminalDisplay::updateImage()
   CharacterColor _clipboard;       // undefined
   int cr  = -1;   // undefined
 
-  const int linesToUpdate = qMin(this->_lines, qMax(0,lines  ));
-  const int columnsToUpdate = qMin(this->_columns,qMax(0,columns));
+  const int linesToUpdate = qMin(this->_lines, qMax(0, lines  ));
+  const int columnsToUpdate = qMin(this->_columns,qMax(0, columns));
+
+  //qDebug() << "lines to update" << linesToUpdate << "columnsToUpdate" << columnsToUpdate;
 
   QChar *disstrU = new QChar[columnsToUpdate];
   char *dirtyMask = new char[columnsToUpdate+2];
@@ -1014,6 +1016,7 @@ void TerminalDisplay::updateImage()
             dirtyMask[x] = true;
         }
     }
+    dirtyMask[0] = true;
 
     if (!_resizing) // not while _resizing, we're expecting a paintEvent
     for (x = 0; x < columnsToUpdate; ++x)
@@ -1077,7 +1080,7 @@ void TerminalDisplay::updateImage()
     //the top one is actually
     //drawn.
     if (_lineProperties.count() > y)
-        updateLine |= (_lineProperties[y] & LINE_DOUBLEHEIGHT);
+        updateLine |= (_lineProperties[y].property & LINE_DOUBLEHEIGHT);
 
     // if the characters on the line are different in the old and the new _image
     // then this line must be repainted.
@@ -1397,13 +1400,15 @@ int TerminalDisplay::textWidth(const int startColumn, const int length, const in
 {
   QFontMetrics fm(font());
   int result = 0;
-  for (int column = 0; column < length; column++) {
+  for (int column = 0; column < length; column++)
+  {
     result += fm.width(_image[loc(startColumn + column, line)].character);
   }
   return result;
 }
 
-QRect TerminalDisplay::calculateTextArea(int topLeftX, int topLeftY, int startColumn, int line, int length) {
+QRect TerminalDisplay::calculateTextArea(int topLeftX, int topLeftY, int startColumn, int line, int length)
+{
   int left = _fixedFont ? _fontWidth * startColumn : textWidth(0, startColumn, line);
   int top = _fontHeight * line;
   int width = _fixedFont ? _fontWidth * length : textWidth(startColumn, length, line);
@@ -1427,8 +1432,38 @@ void TerminalDisplay::drawContents(QPainter &paint, const QRect &rect)
   const int bufferSize = _usedColumns;
   QString unistr;
   unistr.reserve(bufferSize);
+ // qDebug() << "draw from" << luy << "to" << rly;
   for (int y = luy; y <= rly; y++)
   {
+
+      unsigned int commandCount = 0;
+
+      if (y < _lineProperties.size())
+      {
+         commandCount = _lineProperties[y].commandCount;
+
+          //  qDebug() << "command count for display" << commandCount;
+
+      }
+
+      if (commandCount > 0)
+      {
+          int left = 0;
+          int top = _fontHeight * y;
+          int width = _fontWidth * (rlx+1);
+          QRect textArea(_leftMargin + tLx + left,
+                       _topMargin + tLy + top,
+                       width,
+                       _fontHeight);
+        //  qDebug() << "textArea" << textArea;
+          if (commandCount % 2)
+          {
+             paint.fillRect(textArea, Qt::darkBlue);
+          }
+          else{
+             paint.fillRect(textArea, Qt::darkRed);
+          }
+      }
     quint16 c = _image[loc(lux,y)].character;
     int x = lux;
     if(!c && x)
@@ -1468,8 +1503,12 @@ void TerminalDisplay::drawContents(QPainter &paint, const QRect &rect)
 
       bool lineDraw = isLineChar(c);
       bool doubleWidth = (_image[ qMin(loc(x,y)+1,_imageSize) ].character == 0);
+
       CharacterColor currentForeground = _image[loc(x,y)].foregroundColor;
       CharacterColor currentBackground = _image[loc(x,y)].backgroundColor;
+
+
+
       quint8 currentRendition = _image[loc(x,y)].rendition;
 
       while (x+len <= rlx &&
@@ -1498,18 +1537,28 @@ void TerminalDisplay::drawContents(QPainter &paint, const QRect &rect)
 
          if (y < _lineProperties.size())
          {
-            if (_lineProperties[y] & LINE_DOUBLEWIDTH)
+            if (_lineProperties[y].property & LINE_DOUBLEWIDTH)
+            {
                 textScale.scale(2,1);
+            }
 
-            if (_lineProperties[y] & LINE_DOUBLEHEIGHT)
+            if (_lineProperties[y].property & LINE_DOUBLEHEIGHT)
+            {
                 textScale.scale(1,2);
+            }
+
+
          }
+
 
          //Apply text scaling matrix.
          paint.setWorldTransform(textScale, true);
 
          //calculate the area in which the text will be drawn
          QRect textArea = calculateTextArea(tLx, tLy, x, y, len);
+
+
+
 
          //move the calculated area to take account of scaling applied to the painter.
          //the position of the area from the origin (0,0) is scaled
@@ -1518,6 +1567,8 @@ void TerminalDisplay::drawContents(QPainter &paint, const QRect &rect)
          //painting does actually start from textArea.topLeft()
          //(instead of textArea.topLeft() * painter-scale)
          textArea.moveTopLeft( textScale.inverted().map(textArea.topLeft()) );
+
+
 
          //paint text fragment
          drawTextFragment(    paint,
@@ -1539,7 +1590,7 @@ void TerminalDisplay::drawContents(QPainter &paint, const QRect &rect)
             //both _lines will have the LINE_DOUBLEHEIGHT attribute.
             //If the current line has the LINE_DOUBLEHEIGHT attribute,
             //we can therefore skip the next line
-            if (_lineProperties[y] & LINE_DOUBLEHEIGHT)
+            if (_lineProperties[y].property & LINE_DOUBLEHEIGHT)
                 y++;
          }
 
@@ -1999,7 +2050,7 @@ void TerminalDisplay::extendSelection( const QPoint& position )
     i = loc(left.x(),left.y());
     if (i>=0 && i<=_imageSize) {
       selClass = charClass(_image[i].character);
-      while ( ((left.x()>0) || (left.y()>0 && (_lineProperties[left.y()-1] & LINE_WRAPPED) ))
+      while ( ((left.x()>0) || (left.y()>0 && (_lineProperties[left.y()-1].property & LINE_WRAPPED) ))
                       && charClass(_image[i-1].character) == selClass )
       { i--; if (left.x()>0) left.rx()--; else {left.rx()=_usedColumns-1; left.ry()--;} }
     }
@@ -2009,7 +2060,7 @@ void TerminalDisplay::extendSelection( const QPoint& position )
     i = loc(right.x(),right.y());
     if (i>=0 && i<=_imageSize) {
       selClass = charClass(_image[i].character);
-      while( ((right.x()<_usedColumns-1) || (right.y()<_usedLines-1 && (_lineProperties[right.y()] & LINE_WRAPPED) ))
+      while( ((right.x()<_usedColumns-1) || (right.y()<_usedLines-1 && (_lineProperties[right.y()].property & LINE_WRAPPED) ))
                       && charClass(_image[i+1].character) == selClass )
       { i++; if (right.x()<_usedColumns-1) right.rx()++; else {right.rx()=0; right.ry()++; } }
     }
@@ -2034,9 +2085,9 @@ void TerminalDisplay::extendSelection( const QPoint& position )
     QPoint above = above_not_below ? here : _iPntSelCorr;
     QPoint below = above_not_below ? _iPntSelCorr : here;
 
-    while (above.y()>0 && (_lineProperties[above.y()-1] & LINE_WRAPPED) )
+    while (above.y()>0 && (_lineProperties[above.y()-1].property & LINE_WRAPPED) )
       above.ry()--;
-    while (below.y()<_usedLines-1 && (_lineProperties[below.y()] & LINE_WRAPPED) )
+    while (below.y()<_usedLines-1 && (_lineProperties[below.y()].property & LINE_WRAPPED) )
       below.ry()++;
 
     above.setX(0);
@@ -2274,7 +2325,7 @@ void TerminalDisplay::mouseDoubleClickEvent(QMouseEvent* ev)
   {
      // find the start of the word
      int x = bgnSel.x();
-     while ( ((x>0) || (bgnSel.y()>0 && (_lineProperties[bgnSel.y()-1] & LINE_WRAPPED) ))
+     while ( ((x>0) || (bgnSel.y()>0 && (_lineProperties[bgnSel.y()-1].property & LINE_WRAPPED) ))
                      && charClass(_image[i-1].character) == selClass )
      {
        i--;
@@ -2293,7 +2344,7 @@ void TerminalDisplay::mouseDoubleClickEvent(QMouseEvent* ev)
      // find the end of the word
      i = loc( endSel.x(), endSel.y() );
      x = endSel.x();
-     while( ((x<_usedColumns-1) || (endSel.y()<_usedLines-1 && (_lineProperties[endSel.y()] & LINE_WRAPPED) ))
+     while( ((x<_usedColumns-1) || (endSel.y()<_usedLines-1 && (_lineProperties[endSel.y()].property & LINE_WRAPPED) ))
                      && charClass(_image[i+1].character) == selClass )
      {
          i++;
@@ -2397,7 +2448,7 @@ void TerminalDisplay::mouseTripleClickEvent(QMouseEvent* ev)
   _actSel = 2; // within selection
   emit isBusySelecting(true); // Keep it steady...
 
-  while (_iPntSel.y()>0 && (_lineProperties[_iPntSel.y()-1] & LINE_WRAPPED) )
+  while (_iPntSel.y()>0 && (_lineProperties[_iPntSel.y()-1].property & LINE_WRAPPED) )
     _iPntSel.ry()--;
 
   if (_tripleClickMode == SelectForwardsFromCursor) {
@@ -2407,7 +2458,7 @@ void TerminalDisplay::mouseTripleClickEvent(QMouseEvent* ev)
     int x = _iPntSel.x();
 
     while ( ((x>0) ||
-             (_iPntSel.y()>0 && (_lineProperties[_iPntSel.y()-1] & LINE_WRAPPED) )
+             (_iPntSel.y()>0 && (_lineProperties[_iPntSel.y()-1].property & LINE_WRAPPED) )
             )
             && charClass(_image[i-1].character) == selClass )
     {
@@ -2429,7 +2480,7 @@ void TerminalDisplay::mouseTripleClickEvent(QMouseEvent* ev)
     _tripleSelBegin = QPoint( 0, _iPntSel.y() );
   }
 
-  while (_iPntSel.y()<_lines-1 && (_lineProperties[_iPntSel.y()] & LINE_WRAPPED) )
+  while (_iPntSel.y()<_lines-1 && (_lineProperties[_iPntSel.y()].property & LINE_WRAPPED) )
     _iPntSel.ry()++;
 
   _screenWindow->setSelectionEnd( _columns - 1 , _iPntSel.y() );
@@ -2669,6 +2720,7 @@ void TerminalDisplay::inputMethodEvent( QInputMethodEvent* event )
 
     event->accept();
 }
+
 QVariant TerminalDisplay::inputMethodQuery( Qt::InputMethodQuery query ) const
 {
     const QPoint cursorPos = _screenWindow ? _screenWindow->cursorPosition() : QPoint(0,0);
@@ -2691,7 +2743,7 @@ QVariant TerminalDisplay::inputMethodQuery( Qt::InputMethodQuery query ) const
                 QTextStream stream(&lineText);
                 PlainTextDecoder decoder;
                 decoder.begin(&stream);
-                decoder.decodeLine(&_image[loc(0,cursorPos.y())],_usedColumns,_lineProperties[cursorPos.y()]);
+                decoder.decodeLine(&_image[loc(0,cursorPos.y())],_usedColumns,_lineProperties[cursorPos.y()].property);
                 decoder.end();
                 return lineText;
             }

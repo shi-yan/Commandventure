@@ -31,7 +31,7 @@
 #define TAB_CUSTOM_NAME_PROPERTY "custom_name"
 
 
-TabWidget::TabWidget(QWidget* parent) : QTabWidget(parent), tabNumerator(0)
+TabWidget::TabWidget(QWidget* parent) : DockTabWidget(parent), tabNumerator(0)
 {
     setFocusPolicy(Qt::NoFocus);
 

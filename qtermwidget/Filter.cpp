@@ -160,7 +160,7 @@ void TerminalImageFilterChain::setImage(const Character* const image , int lines
     for (int i=0 ; i < lines ; i++)
     {
         _linePositions->append(_buffer->length());
-        decoder.decodeLine(image + i*columns,columns,LINE_DEFAULT);
+        decoder.decodeLine(image + i*columns, columns, (unsigned char)LINE_DEFAULT);
 
         // pretend that each line ends with a newline character.
         // this prevents a link that occurs at the end of one line
@@ -172,8 +172,10 @@ void TerminalImageFilterChain::setImage(const Character* const image , int lines
         // TODO - Use the "line wrapped" attribute associated with lines in a
         // terminal image to avoid adding this imaginary character for wrapped
         // lines
-        if ( !(lineProperties.value(i,LINE_DEFAULT) & LINE_WRAPPED) )
+        if ( !(lineProperties.value(i,{0, LINE_DEFAULT}).property & LINE_WRAPPED) )
+        {
             lineStream << QChar('\n');
+        }
     }
     decoder.end();
 }

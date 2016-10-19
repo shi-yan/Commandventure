@@ -105,6 +105,7 @@ int ScreenWindow::endWindowLine() const
     return qMin(currentLine() + windowLines() - 1,
                 lineCount() - 1);
 }
+
 QVector<LineProperty> ScreenWindow::getLineProperties()
 {
     QVector<LineProperty> result = _screen->getLineProperties(currentLine(),endWindowLine());
@@ -125,11 +126,13 @@ void ScreenWindow::getSelectionStart( int& column , int& line )
     _screen->getSelectionStart(column,line);
     line -= currentLine();
 }
+
 void ScreenWindow::getSelectionEnd( int& column , int& line )
 {
     _screen->getSelectionEnd(column,line);
     line -= currentLine();
 }
+
 void ScreenWindow::setSelectionStart( int column , int line , bool columnMode )
 {
     _screen->setSelectionStart( column , qMin(line + currentLine(),endWindowLine())  , columnMode);

@@ -60,7 +60,7 @@ public:
      */
     virtual void decodeLine(const Character* const characters,
                             int count,
-                            LineProperty properties) = 0;
+                            unsigned char properties) = 0;
 };
 
 /**
@@ -97,7 +97,7 @@ public:
 
     virtual void decodeLine(const Character* const characters,
                             int count,
-                            LineProperty properties);
+                            unsigned char properties);
 
 
 private:

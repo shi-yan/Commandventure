@@ -33,6 +33,7 @@
 // Qt
 #include <QTextStream>
 #include <QDate>
+#include <QDebug>
 
 // KDE
 //#include <kdebug.h>
@@ -83,9 +84,13 @@ Character Screen::defaultChar = Character(' ',
     effectiveForeground(CharacterColor()), effectiveBackground(CharacterColor()), effectiveRendition(0),
     lastPos(-1)
 {
+    canUpdateCommandCount = true;
+    commandCount = 0;
     lineProperties.resize(lines+1);
     for (int i=0;i<lines+1;i++)
-        lineProperties[i]=LINE_DEFAULT;
+    {
+        lineProperties[i] = {0, LINE_DEFAULT};
+    }
 
     initTabStops();
     clearSelection();
@@ -156,6 +161,7 @@ int Screen::topMargin() const
 {
     return _topMargin;
 }
+
 int Screen::bottomMargin() const
 {
     return _bottomMargin;
@@ -211,6 +217,8 @@ void Screen::deleteChars(int n)
     Q_ASSERT( cuX+n <= screenLines[cuY].count() );
 
     screenLines[cuY].remove(cuX,n);
+    lineProperties[cuY].commandCount = commandCount;
+
 }
 
 void Screen::insertChars(int n)
@@ -224,12 +232,15 @@ void Screen::insertChars(int n)
 
     if ( screenLines[cuY].count() > columns )
         screenLines[cuY].resize(columns);
+
+    lineProperties[cuY].commandCount = commandCount;
 }
 
 void Screen::deleteLines(int n)
 {
     if (n == 0) n = 1; // Default
     scrollUp(cuY,n);
+
 }
 
 void Screen::insertLines(int n)
@@ -313,7 +324,9 @@ void Screen::resizeImage(int new_lines, int new_columns)
 
     lineProperties.resize(new_lines+1);
     for (int i=lines;(i > 0) && (i<new_lines+1);i++)
-        lineProperties[i] = LINE_DEFAULT;
+    {
+        lineProperties[i] = {0, LINE_DEFAULT};
+    }
 
     clearSelection();
 
@@ -506,7 +519,8 @@ QVector<LineProperty> Screen::getLineProperties( int startLine , int endLine ) c
         //TODO Support for line properties other than wrapped lines
         if (history->isWrappedLine(line))
         {
-            result[index] = (LineProperty)(result[index] | LINE_WRAPPED);
+            result[index].property | LINE_WRAPPED;
+            //result[index] = (unsigned char)(result[index].property | LINE_WRAPPED);
         }
         index++;
     }
@@ -607,9 +621,12 @@ void Screen::initTabStops()
 
 void Screen::newLine()
 {
+    canUpdateCommandCount = true;
+    //qDebug() << "new lines =======================================";
     if (getMode(MODE_NewLine))
         toStartOfLine();
     index();
+    lineProperties[cuY].commandCount = commandCount;
 }
 
 void Screen::checkSelection(int from, int to)
@@ -633,10 +650,14 @@ void Screen::displayCharacter(unsigned short c)
     if (w <= 0)
         return;
 
-    if (cuX+w > columns) {
-        if (getMode(MODE_Wrap)) {
-            lineProperties[cuY] = (LineProperty)(lineProperties[cuY] | LINE_WRAPPED);
+    if (cuX+w > columns)
+    {
+        if (getMode(MODE_Wrap))
+        {
+            struct LineProperty cp = lineProperties[cuY];
+            lineProperties[cuY].property = (unsigned char)(lineProperties[cuY].property | LINE_WRAPPED);
             nextLine();
+            lineProperties[cuY] = cp;
         }
         else
             cuX = columns-w;
@@ -661,7 +682,18 @@ void Screen::displayCharacter(unsigned short c)
     currentChar.character = c;
     currentChar.foregroundColor = effectiveForeground;
     currentChar.backgroundColor = effectiveBackground;
+
+
+    /*if (commandCount % 2 == 0)
+    {
+       currentChar.backgroundColor = CharacterColor(COLOR_SPACE_RGB, 0x00ff0000);
+    }
+    else
+    {
+       currentChar.backgroundColor = CharacterColor(COLOR_SPACE_RGB, 0x000000ff);
+    }
     currentChar.rendition = effectiveRendition;
+    */
 
     int i = 0;
     int newCursorX = cuX + w--;
@@ -700,14 +732,17 @@ int Screen::scrolledLines() const
 {
     return _scrolledLines;
 }
+
 int Screen::droppedLines() const
 {
     return _droppedLines;
 }
+
 void Screen::resetDroppedLines()
 {
     _droppedLines = 0;
 }
+
 void Screen::resetScrolledLines()
 {
     _scrolledLines = 0;
@@ -727,7 +762,8 @@ QRect Screen::lastScrolledRegion() const
 
 void Screen::scrollUp(int from, int n)
 {
-    if (n <= 0 || from + n > _bottomMargin) return;
+    if (n <= 0 || from + n > _bottomMargin)
+        return;
 
     _scrolledLines -= n;
     _lastScrolledRegion = QRect(0,_topMargin,columns-1,(_bottomMargin-_topMargin));
@@ -800,6 +836,7 @@ int Screen::getCursorY() const
 
 void Screen::clearImage(int loca, int loce, char c)
 {
+    qDebug() << "clear image" << loca << loce << c;
     int scr_TL=loc(0,history->getLines());
     //FIXME: check positions
 
@@ -818,14 +855,31 @@ void Screen::clearImage(int loca, int loce, char c)
     //default character, the affected lines can simply be shrunk.
     bool isDefaultCh = (clearCh == Character());
 
+    //qDebug() << "topline" << topLine << "bottomline" << bottomLine;
+
     for (int y=topLine;y<=bottomLine;y++)
     {
-        lineProperties[y] = 0;
 
         int endCol = ( y == bottomLine) ? loce%columns : columns-1;
         int startCol = ( y == topLine ) ? loca%columns : 0;
 
         QVector<Character>& line = screenLines[y];
+
+       // qDebug() << "startcol" << startCol << "endcol" << endCol;
+
+        if (startCol == 0)
+        {
+            if (canUpdateCommandCount == false)
+            {
+                qDebug() << "command decrease";
+                commandCount --;
+            }
+            //cleared entire line, restore line property;
+            lineProperties[y] = {0, LINE_DEFAULT};
+
+            canUpdateCommandCount = true;
+        }
+
 
         if ( isDefaultCh && endCol == columns-1 )
         {
@@ -1178,7 +1232,7 @@ int Screen::copyLineToStream(int line ,
 
     Q_ASSERT( count < MAX_CHARS );
 
-    LineProperty currentLineProperties = 0;
+    LineProperty currentLineProperties = {0, LINE_DEFAULT};
 
     //determine if the line is in the history buffer or the screen image
     if (line < history->getLines())
@@ -1208,7 +1262,9 @@ int Screen::copyLineToStream(int line ,
         history->getCells(line,start,count,characterBuffer);
 
         if ( history->isWrappedLine(line) )
-            currentLineProperties |= LINE_WRAPPED;
+        {
+            currentLineProperties.property |= LINE_WRAPPED;
+        }
     }
     else
     {
@@ -1232,11 +1288,11 @@ int Screen::copyLineToStream(int line ,
         count = qBound(0,count,length-start);
 
         Q_ASSERT( screenLine < lineProperties.count() );
-        currentLineProperties |= lineProperties[screenLine];
+        currentLineProperties.property |= lineProperties[screenLine].property;
     }
 
     // add new line character at end
-    const bool omitLineBreak = (currentLineProperties & LINE_WRAPPED) ||
+    const bool omitLineBreak = (currentLineProperties.property & LINE_WRAPPED) ||
         !preserveLineBreaks;
 
     if ( !omitLineBreak && appendNewLine && (count+1 < MAX_CHARS) )
@@ -1247,7 +1303,7 @@ int Screen::copyLineToStream(int line ,
 
     //decode line and write to text stream
     decoder->decodeLine( (Character*) characterBuffer ,
-            count, currentLineProperties );
+            count, currentLineProperties.property );
 
     return count;
 }
@@ -1267,7 +1323,7 @@ void Screen::addHistLine()
         int oldHistLines = history->getLines();
 
         history->addCellsVector(screenLines[0]);
-        history->addLine( lineProperties[0] & LINE_WRAPPED );
+        history->addLine( lineProperties[0].property & LINE_WRAPPED );
 
         int newHistLines = history->getLines();
 
@@ -1345,15 +1401,27 @@ const HistoryType& Screen::getScroll() const
     return history->getType();
 }
 
-void Screen::setLineProperty(LineProperty property , bool enable)
+void Screen::setLineProperty(unsigned char property , bool enable)
 {
     if ( enable )
-        lineProperties[cuY] = (LineProperty)(lineProperties[cuY] | property);
+        lineProperties[cuY].property = (unsigned char)(lineProperties[cuY].property | property);
     else
-        lineProperties[cuY] = (LineProperty)(lineProperties[cuY] & ~property);
+        lineProperties[cuY].property = (unsigned char)(lineProperties[cuY].property & ~property);
 }
+
 void Screen::fillWithDefaultChar(Character* dest, int count)
 {
     for (int i=0;i<count;i++)
         dest[i] = defaultChar;
+}
+
+void Screen::incrementCommandCount()
+{
+    if (canUpdateCommandCount)
+    {
+        canUpdateCommandCount = false;
+        commandCount++;
+        qDebug() << "------------------ increase command";
+        lineProperties[cuY].commandCount = commandCount;
+    }
 }

@@ -33,8 +33,8 @@
 namespace Konsole
 {
 
-typedef unsigned char LineProperty;
 class Character;
+struct LineProperty;
 
 /**
  * A filter processes blocks of text looking for certain patterns (such as URLs or keywords from a list)

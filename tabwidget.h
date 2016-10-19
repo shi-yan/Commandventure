@@ -21,6 +21,7 @@
 
 #include <QTabWidget>
 #include <QMap>
+#include "docktabwidget.h"
 
 #include "properties.h"
 
@@ -29,7 +30,7 @@ class QAction;
 class QActionGroup;
 
 
-class TabWidget : public QTabWidget
+class TabWidget : public DockTabWidget
 {
 Q_OBJECT
 public:

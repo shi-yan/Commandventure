@@ -32,7 +32,10 @@
 namespace Konsole
 {
 
-typedef unsigned char LineProperty;
+struct LineProperty {
+    unsigned int commandCount;
+    unsigned char property;
+};
 
 static const int LINE_DEFAULT        = 0;
 static const int LINE_WRAPPED          = (1 << 0);

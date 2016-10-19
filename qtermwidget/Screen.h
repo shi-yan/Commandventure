@@ -377,6 +377,7 @@ public:
      * other attributes control the size of characters in the line.
      */
     QVector<LineProperty> getLineProperties( int startLine , int endLine ) const;
+    unsigned int commandCount;
 
 
     /** Return the number of lines. */
@@ -497,7 +498,10 @@ public:
      *
      * @param enable true to apply the attribute to the current line or false to remove it
      */
-    void setLineProperty(LineProperty property , bool enable);
+    void setLineProperty(unsigned char property , bool enable);
+
+    bool canUpdateCommandCount;
+    void incrementCommandCount();
 
     /**
      * Returns the number of lines that the image has been scrolled up or down by,

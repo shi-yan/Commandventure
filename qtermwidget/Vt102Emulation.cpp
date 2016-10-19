@@ -404,6 +404,7 @@ void Vt102Emulation::processWindowAttributeChange()
 
   _pendingTitleUpdates[attributeToChange] = newValue;
   _titleUpdateTimer->start(20);
+  _currentScreen->incrementCommandCount();
   emit metaDataChanged(newValue);
 }
 
@@ -1052,7 +1053,7 @@ void Vt102Emulation::sendKeyEvent( QKeyEvent* event )
             textToSend += "\005";
         }*/
         else {
-            qDebug() << "event text" << event->text();
+         //   qDebug() << "event text" << event->text();
             textToSend += _codec->fromUnicode(event->text());
         }
 

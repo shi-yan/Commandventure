@@ -909,7 +909,7 @@ void Session::zmodemFinished()
 
 void Session::onReceiveBlock( const char * buf, int len )
 {
-    qDebug() << "received block:" << buf;
+  //  qDebug() << "received block:" << buf;
     _emulation->receiveData( buf, len );
     emit receivedData( QString::fromLatin1( buf, len ) );
 }

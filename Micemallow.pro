@@ -50,7 +50,8 @@ SOURCES += main.cpp\
     qtermwidget/TerminalDisplay.cpp \
     qtermwidget/tools.cpp \
     qtermwidget/Vt102Emulation.cpp \
-    qtermwidget/StatusBar.cpp
+    qtermwidget/StatusBar.cpp \
+    docktabwidget.cpp
 
 HEADERS  += mainwindow.h \
     bookmarkswidget.h \
@@ -94,7 +95,8 @@ HEADERS  += mainwindow.h \
     qtermwidget/TerminalDisplay.h \
     qtermwidget/tools.h \
     qtermwidget/Vt102Emulation.h \
-    qtermwidget/StatusBar.h
+    qtermwidget/StatusBar.h \
+    docktabwidget.h
 
 RESOURCES += \
     icons.qrc

@@ -28,7 +28,7 @@
 
 #define out
 
-#define STR_VERSION "Micemallow"
+#define STR_VERSION "1.0"
 
 const char* const short_options = "vhw:e:dp:";
 
@@ -105,12 +105,12 @@ int main(int argc, char *argv[])
 {
     setenv("TERM", "xterm", 1); // TODO/FIXME: why?
 
-    QApplication::setApplicationName("qterminal");
+    QApplication::setApplicationName("Micemallow");
     QApplication::setApplicationVersion(STR_VERSION);
     QApplication::setOrganizationDomain("qterminal.org");
-#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
-    QApplication::setDesktopFileName(QLatin1String("qterminal.desktop"));
-#endif
+//#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+    QApplication::setDesktopFileName(QLatin1String("Micemallow.desktop"));
+//#endif
     // Warning: do not change settings format. It can screw bookmarks later.
     QSettings::setDefaultFormat(QSettings::IniFormat);
 
@@ -121,8 +121,8 @@ int main(int argc, char *argv[])
     QPalette darkPalette;
     darkPalette.setColor(QPalette::Window, QColor(53,53,53));
     darkPalette.setColor(QPalette::WindowText, Qt::white);
-    darkPalette.setColor(QPalette::Base, QColor(25,25,25));
-    darkPalette.setColor(QPalette::AlternateBase, QColor(53,53,53));
+    darkPalette.setColor(QPalette::Base, QColor(38,38,38));
+    darkPalette.setColor(QPalette::AlternateBase, QColor(33,33,33));
     darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
     darkPalette.setColor(QPalette::ToolTipText, Qt::white);
     darkPalette.setColor(QPalette::Text, Qt::white);

@@ -1282,7 +1282,7 @@ int Screen::copyLineToStream(int line ,
         count = qBound(0,count,length-start);
 
         Q_ASSERT( screenLine < lineProperties.count() );
-        currentLineProperties.property |= lineProperties[screenLine].property;
+        currentLineProperties = lineProperties[screenLine];
     }
 
     // add new line character at end

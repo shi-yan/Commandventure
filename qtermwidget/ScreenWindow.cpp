@@ -166,6 +166,7 @@ void ScreenWindow::setWindowLines(int lines)
     Q_ASSERT(lines > 0);
     _windowLines = lines;
 }
+
 int ScreenWindow::windowLines() const
 {
     return _windowLines;

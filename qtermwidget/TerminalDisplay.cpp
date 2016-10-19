@@ -141,6 +141,8 @@ void TerminalDisplay::setScreenWindow(ScreenWindow* window)
         connect( _screenWindow , SIGNAL(outputChanged()) , this , SLOT(updateLineProperties()) );
         connect( _screenWindow , SIGNAL(outputChanged()) , this , SLOT(updateImage()) );
         connect( _screenWindow , SIGNAL(outputChanged()) , this , SLOT(updateFilters()) );
+
+        connect( _screenWindow , SIGNAL(scrolled(int)) , this , SLOT(updateLineProperties()) );
         connect( _screenWindow , SIGNAL(scrolled(int)) , this , SLOT(updateFilters()) );
         window->setWindowLines(_lines);
     }
@@ -1458,10 +1460,10 @@ void TerminalDisplay::drawContents(QPainter &paint, const QRect &rect)
         //  qDebug() << "textArea" << textArea;
           if (commandCount % 2)
           {
-             paint.fillRect(textArea, Qt::darkBlue);
+             paint.fillRect(textArea, palette().color(QPalette::Base));
           }
           else{
-             paint.fillRect(textArea, Qt::darkRed);
+             paint.fillRect(textArea, palette().color(QPalette::AlternateBase));
           }
       }
     quint16 c = _image[loc(lux,y)].character;

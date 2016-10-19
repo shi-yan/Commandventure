@@ -775,6 +775,8 @@ void MainWindow::onCurrentTitleChanged(int index)
         title = consoleTabulator->tabText(index);
         icon = consoleTabulator->tabIcon(index);
     }
-    setWindowTitle(title.isEmpty() || !Properties::Instance()->changeWindowTitle ? QStringLiteral("QTerminal") : title);
-    setWindowIcon(icon.isNull() || !Properties::Instance()->changeWindowIcon ? QIcon::fromTheme("utilities-terminal") : icon);
+    //setWindowTitle(title.isEmpty() || !Properties::Instance()->changeWindowTitle ? QStringLiteral("QTerminal") : title);
+    //setWindowIcon(icon.isNull() || !Properties::Instance()->changeWindowIcon ? QIcon::fromTheme("utilities-terminal") : icon);
+    setWindowTitle(QStringLiteral("Micemallow"));
+    setWindowIcon(QIcon::fromTheme("utilities-terminal"));
 }

@@ -34,7 +34,7 @@
 #include <QTextStream>
 #include <QDate>
 #include <QDebug>
-
+#include "MinimapNavigator.h"
 // KDE
 //#include <kdebug.h>
 
@@ -92,6 +92,7 @@ Character Screen::defaultChar = Character(' ',
         lineProperties[i] = {0, LINE_DEFAULT};
     }
 
+    m_minimap = new MinimapNavigator();
     initTabStops();
     clearSelection();
     reset();
@@ -104,6 +105,7 @@ Screen::~Screen()
 {
     delete[] screenLines;
     delete history;
+    delete m_minimap;
 }
 
 void Screen::cursorUp(int n)
@@ -1317,6 +1319,7 @@ void Screen::addHistLine()
         int oldHistLines = history->getLines();
 
         history->addCellsVector(screenLines[0]);
+        m_minimap->pushLine(screenLines[0]);
         history->addLineProperty(lineProperties[0] );
 
         int newHistLines = history->getLines();

@@ -40,6 +40,9 @@
 #define MODE_NewLine   5
 #define MODES_SCREEN   6
 
+
+class MinimapNavigator;
+
 namespace Konsole
 {
 
@@ -378,7 +381,7 @@ public:
      */
     QVector<LineProperty> getLineProperties( int startLine , int endLine ) const;
     unsigned int commandCount;
-
+    MinimapNavigator *m_minimap;
 
     /** Return the number of lines. */
     int getLines() const

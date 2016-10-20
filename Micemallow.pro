@@ -51,7 +51,9 @@ SOURCES += main.cpp\
     qtermwidget/tools.cpp \
     qtermwidget/Vt102Emulation.cpp \
     qtermwidget/StatusBar.cpp \
-    docktabwidget.cpp
+    docktabwidget.cpp \
+    qtermwidget/MinimapNavigator.cpp \
+    qtermwidget/HistoryMinimap.cpp
 
 HEADERS  += mainwindow.h \
     bookmarkswidget.h \
@@ -96,7 +98,9 @@ HEADERS  += mainwindow.h \
     qtermwidget/tools.h \
     qtermwidget/Vt102Emulation.h \
     qtermwidget/StatusBar.h \
-    docktabwidget.h
+    docktabwidget.h \
+    qtermwidget/MinimapNavigator.h \
+    qtermwidget/HistoryMinimap.h
 
 RESOURCES += \
     icons.qrc

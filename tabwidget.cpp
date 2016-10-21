@@ -53,6 +53,7 @@ TabWidget::TabWidget(QWidget* parent) : DockTabWidget(parent), tabNumerator(0)
     connect(tabBar(), SIGNAL(tabMoved(int,int)), this, SLOT(updateTabIndices()));
     connect(this, SIGNAL(tabRenameRequested(int)), this, SLOT(renameSession(int)));
 
+    this->setStyleSheet("color: #ff000000;");
 }
 
 TermWidgetHolder * TabWidget::terminalHolder()

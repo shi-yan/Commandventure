@@ -28,6 +28,7 @@
 #include "properties.h"
 #include "propertiesdialog.h"
 #include "bookmarkswidget.h"
+#include "qtermwidget/StatusBar.h"
 
 #define STR_VERSION "Micemallow"
 
@@ -103,6 +104,8 @@ MainWindow::MainWindow(const QString& work_dir,
     consoleTabulator->addNewTab(command);
 
     m_menuBar->setNativeMenuBar(true);
+    m_statusBar->addWidget(new StatusBar(this));
+
 }
 
 MainWindow::~MainWindow()

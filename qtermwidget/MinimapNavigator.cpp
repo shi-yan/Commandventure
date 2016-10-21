@@ -11,7 +11,7 @@ MinimapNavigator::MinimapNavigator(QWidget *parent)
 
 void MinimapNavigator::pushLine(QVector<Konsole::Character> &c)
 {
-    if (m_lineCount < 100)
+    /*if (m_lineCount < 100)
     {
         if (text.size() != c.size())
         {
@@ -36,5 +36,5 @@ void MinimapNavigator::pushLine(QVector<Konsole::Character> &c)
         m_painter.end();
     }
 
-    m_minimapImage.save("test.png");
+    m_minimapImage.save("test.png");*/
 }

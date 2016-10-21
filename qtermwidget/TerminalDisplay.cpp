@@ -744,15 +744,15 @@ void TerminalDisplay::drawTextFragment(QPainter& painter ,
                                        const Character* style)
 {
     painter.save();
-
+//-------------------------------- this need to change;
     // setup painter
     const QColor foregroundColor = style->foregroundColor.color(_colorTable);
-    const QColor backgroundColor = style->backgroundColor.color(_colorTable);
+    const QColor backgroundColor =  style->backgroundColor.color(_colorTable);
 
     // draw background if different from the display's background color
-    if ( backgroundColor != palette().background().color() )
-        drawBackground(painter,rect,backgroundColor,
-                       false /* do not use transparency */);
+   // if ( backgroundColor != palette().background().color() )
+    //    drawBackground(painter,rect,backgroundColor,
+                   //    false /* do not use transparency */);
 
     // draw cursor shape if the current character is the cursor
     // this may alter the foreground and background colors
@@ -1249,7 +1249,7 @@ void TerminalDisplay::paintEvent( QPaintEvent* pe )
 
   foreach (const QRect &rect, (pe->region() & contentsRect()).rects())
   {
-    drawBackground(paint,rect,palette().background().color(),
+    drawBackground(paint,rect,QColor(48,51,61),
                     true /* use opacity setting */);
 
 
@@ -1483,10 +1483,10 @@ void TerminalDisplay::drawContents(QPainter &paint, const QRect &rect)
         //  qDebug() << "textArea" << textArea;
           if (commandCount % 2)
           {
-             paint.fillRect(textArea, palette().color(QPalette::Base));
+             paint.fillRect(textArea, QColor(54,59,77));
           }
           else{
-             paint.fillRect(textArea, palette().color(QPalette::AlternateBase));
+             paint.fillRect(textArea, QColor(48,51,61));
           }
       }
     quint16 c = _image[loc(lux,y)].character;

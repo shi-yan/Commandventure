@@ -273,12 +273,6 @@ void QTermWidget::init(int startnow)
     m_layout->addWidget(m_searchBar);
     m_searchBar->hide();
 
-    m_statusBar = new StatusBar(this);
-    m_statusBar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
-    m_layout->addWidget(m_statusBar);
-
-    connect(m_statusBar, SIGNAL(openCurrentLocation()), this, SLOT(onOpenCurrentLocation()));
-
     if (startnow && m_impl->m_session) {
         m_impl->m_session->run();
     }

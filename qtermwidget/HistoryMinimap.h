@@ -7,7 +7,7 @@
 class HistoryMinimap : public QObject
 {
 private:
-    QImage m_historyMinimap;
+    //QImage m_historyMinimap;
 
 public:
     HistoryMinimap();

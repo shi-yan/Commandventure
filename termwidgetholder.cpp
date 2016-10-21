@@ -45,6 +45,8 @@ TermWidgetHolder::TermWidgetHolder(const QString & wdir, const QString & shell, 
     lay->addWidget(s);
 
     setLayout(lay);
+
+    setStyleSheet("QWidget{ border-left: 1px  solid #1b1c21; border-bottom: 1px  solid #1b1c21; border-right: 1px  solid #1b1c21; background-color: rgb(48, 51, 61);}");
 }
 
 TermWidgetHolder::~TermWidgetHolder()

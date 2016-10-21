@@ -109,7 +109,8 @@ DISTFILES += \
     Micemallow.pro.user \
     qtermwidget/LineFont.src \
     qtermwidget/default.keytab \
-    qtermwidget/README
+    qtermwidget/README \
+    icomoon.ttf
 
 FORMS += \
     qtermwidget/SearchBar.ui \

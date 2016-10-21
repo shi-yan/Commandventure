@@ -14,18 +14,87 @@
    <string>MainWindow</string>
   </property>
   <property name="autoFillBackground">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">QFrame
+   <string notr="true">QWidget
 {
-selection-background-color: rgb(53, 53, 53);
+	border:0px;
+	background-color: rgb(38, 40, 48);
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">QTabBar::tab 
+{
+    background-color: rgb(38, 40, 48);
+    border: 1px ;
+    border-left-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #3d3f4a, stop: 0.4 #343742, stop: 1.0 #313440);
+    border-bottom-color: #313440; /* same as the pane color */
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    min-width: 8ex;
+    padding: 2px;
+	color: rgb(211, 214, 222);
+	height: 28px;
+}
+
+QScrollBar:up-arrow:vertical, QScrollBar::down-arrow:vertical {
+    border: 2px solid grey;
+    width: 3px;
+    height: 3px;
+    background: white;
+}
+
+ QScrollBar::handle:vertical {
+     background: white;
+     min-height: 20px;
+ }
+
+QTabBar
+{
+   background-color: rgb(38, 40, 48);
+}
+
+QWidget
+{
+	background-color: rgb(38, 40, 48);
+}
+
+QTabWidget QWidget
+{
+	color: rgb(255, 0, 4);
+	background-color: rgb(48, 51, 61);
+    border: 0px solid #000000;
+}
+
+
+
+QTabWidget::tab-bar QWidget{
+    left: 5px; /* move to the right by 5px */
+    background-color: rgb(38, 40, 48);
+}
+
+QTabWidget::pane QWidget{ /* The tab widget frame */
+    border-top: 0px solid #C2C7CB;
+    background-color: rgb(38, 40, 48);
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover 
+{
+    border:1px solid #1b1c21;
+    border-left: 2px  solid #5666f5;
+    border-bottom: 0px  solid #313440;
+
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #3d3f4a, stop: 0.4 #343742,
+                                stop: 0.5 #313440, stop: 1.0 #313440);
+}</string>
+   </property>
    <layout class="QGridLayout">
     <property name="leftMargin">
-     <number>0</number>
+     <number>2</number>
     </property>
     <property name="topMargin">
      <number>0</number>
@@ -43,6 +112,32 @@ selection-background-color: rgb(53, 53, 53);
         <width>320</width>
         <height>200</height>
        </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QTabWidget{
+    
+	color: rgb(255, 0, 4);
+	background-color: rgb(48, 51, 61);
+    border: 1px solid #C4C4C3;
+}
+
+QTabBar::tab {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
+                                stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
+    border: 2px solid #C4C4C3;
+    border-bottom-color: #C2C7CB; /* same as the pane color */
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    min-width: 8ex;
+    padding: 2px;
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #fafafa, stop: 0.4 #f4f4f4,
+                                stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
+}</string>
       </property>
       <property name="tabPosition">
        <enum>QTabWidget::South</enum>
@@ -70,7 +165,7 @@ selection-background-color: rgb(53, 53, 53);
     </rect>
    </property>
    <property name="autoFillBackground">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <widget class="QMenu" name="menu_File">
     <property name="title">
@@ -107,6 +202,17 @@ selection-background-color: rgb(53, 53, 53);
    <addaction name="menu_Edit"/>
    <addaction name="menu_Window"/>
    <addaction name="menu_Help"/>
+  </widget>
+  <widget class="QStatusBar" name="m_statusBar">
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QStatusBar {
+background-color: rgb(38, 40, 48);
+	color: rgb(157, 161, 179);
+}</string>
+   </property>
   </widget>
   <action name="actAbout">
    <property name="icon">

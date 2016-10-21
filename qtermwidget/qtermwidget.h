@@ -286,7 +286,6 @@ private:
     void showInGraphicalShell(QString &pathIn);
     TermWidgetImpl * m_impl;
     SearchBar* m_searchBar;
-    StatusBar *m_statusBar;
     QVBoxLayout *m_layout;
 };
 

@@ -25,13 +25,13 @@
 #include "third-party/qxtglobalshortcut.h"
 
 class QToolButton;
-class DockTabWidget;
+class TabWidget;
 
 class MainWindow : public QMainWindow , private Ui::mainWindow
 {
     Q_OBJECT
 
-    friend class DockTabWidget;
+    friend class TabWidget;
 
 public:
     MainWindow(const QString& work_dir, const QString& command,

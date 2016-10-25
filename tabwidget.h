@@ -95,6 +95,9 @@ protected:
         renaming or new tab opening
      */
     bool eventFilter(QObject *obj, QEvent *event);
+
+    DockTabWidget* createAnother(QWidget *parent) override;
+
 protected slots:
     void updateTabIndices();
     void onTermTitleChanged(QString title, QString icon);

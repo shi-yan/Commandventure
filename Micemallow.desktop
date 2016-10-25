@@ -1,0 +1,23 @@
+[Desktop Entry]
+Version=1.0
+Name=Micemallow
+# Only KDE 4 seems to use GenericName, so we reuse the KDE strings.
+# From Ubuntu's language-pack-kde-XX-base packages, version 9.04-20090413.
+GenericName=Open Terminal
+Comment=Open Terminal
+Exec=/home/shiy/build-Micemallow-Desktop_Qt_5_7_0_GCC_64bit-Release/Micemallow
+Terminal=false
+Icon=utilities-terminal
+Type=Application
+Categories=System;TerminalEmulator;Utility;
+X-Ayatana-Desktop-Shortcuts=NewWindow;NewIncognito
+
+[NewWindow Shortcut Group]
+Name=New Window
+Exec=/home/shiy/build-Micemallow-Desktop_Qt_5_7_0_GCC_64bit-Release/Micemallow
+TargetEnvironment=Unity
+
+[NewIncognito Shortcut Group]
+Name=New Incognito Window
+Exec=/home/shiy/build-Micemallow-Desktop_Qt_5_7_0_GCC_64bit-Release/Micemallow
+TargetEnvironment=Unity

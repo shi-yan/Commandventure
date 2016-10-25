@@ -11,12 +11,16 @@ class MinimapNavigator : public QWidget
 {
 private:
     QPixmap m_currentScreenCachedImage;
+    QPixmap m_historyScreenCachedImage;
 
-
+    int historyHeight;
 public:
     MinimapNavigator(QWidget *parent = 0);
 
     QPixmap *getCurrentScreenCachedImage();
+    QPixmap *getHistoryScreenCachedImage();
+
+    void scrollImage(int dx, int dy, QRect &region);
 
 protected:
     void paintEvent(QPaintEvent*);

@@ -102,6 +102,8 @@ HEADERS  += mainwindow.h \
     qtermwidget/MinimapNavigator.h \
     qtermwidget/HistoryMinimap.h
 
+QMAKE_LFLAGS += '-Wl,-rpath=\'\$$ORIGIN\''
+
 RESOURCES += \
     icons.qrc
 

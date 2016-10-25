@@ -247,7 +247,7 @@ void QTermWidget::startTerminalTeletype()
 void QTermWidget::init(int startnow)
 {
     m_layout = new QVBoxLayout();
-    m_layout->setMargin(0);
+    m_layout->setMargin(20);
     setLayout(m_layout);
 
     setAutoFillBackground(true);
@@ -264,6 +264,7 @@ void QTermWidget::init(int startnow)
     m_impl->m_minimap->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
 
     m_hlayout->addWidget(m_impl->m_minimap);
+
 
     connect(m_impl->m_session, SIGNAL(bellRequest(QString)), m_impl->m_terminalDisplay, SLOT(bell(QString)));
     connect(m_impl->m_terminalDisplay, SIGNAL(notifyBell(QString)), this, SIGNAL(bell(QString)));
@@ -498,7 +499,6 @@ void QTermWidget::resizeEvent(QResizeEvent*)
     //qDebug("global window resizing...with %d %d", this->size().width(), this->size().height());
     m_impl->m_terminalDisplay->resize(this->size());
 }
-
 
 void QTermWidget::sessionFinished()
 {

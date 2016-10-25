@@ -2,7 +2,6 @@
 #include <QApplication>
 
 #include "docktabwidget.h"
-#include "mainwindow.h"
 
 #define MIMETYPE_TABINDEX "x-paintfield-tabindex"
 
@@ -92,50 +91,7 @@ void DockTabWidget::deleteIfEmpty()
 
 DockTabWidget *DockTabWidget::createAnother(QWidget *parent)
 {
-    MainWindow *mainWindow = new MainWindow("~",
-                           QString(),
-                           false);
-
-    mainWindow->consoleTabulator->deleteLater();
-
-    mainWindow->consoleTabulator = new TabWidget(mainWindow->centralWidget());
-
-
-    mainWindow->consoleTabulator->setObjectName(QStringLiteral("consoleTabulator"));
-    mainWindow->consoleTabulator->setMinimumSize(QSize(320, 200));
-    mainWindow->consoleTabulator->setStyleSheet(QLatin1String("QTabWidget{\n"
-"    \n"
-"	color: rgb(255, 0, 4);\n"
-"	background-color: rgb(48, 51, 61);\n"
-"    border: 1px solid #C4C4C3;\n"
-"}\n"
-"\n"
-"QTabBar::tab {\n"
-"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"                                stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,\n"
-"                                stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);\n"
-"    border: 2px solid #C4C4C3;\n"
-"    border-bottom-color: #C2C7CB; /* same as the pane color */\n"
-"    border-top-left-radius: 4px;\n"
-"    border-top-right-radius: 4px;\n"
-"    min-width: 8ex;\n"
-"    padding: 2px;\n"
-"}\n"
-"\n"
-"QTabBar::tab:selected, QTabBar::tab:hover {\n"
-"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"                                stop: 0 #fafafa, stop: 0.4 #f4f4f4,\n"
-"                                stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);\n"
-"}"));
-    mainWindow->consoleTabulator->setTabShape(QTabWidget::Rounded);
-    mainWindow->consoleTabulator->setElideMode(Qt::ElideNone);
-
-    mainWindow->gridLayout->addWidget(mainWindow->consoleTabulator, 0, 0, 1, 1);
-
-    mainWindow->show();
-
-    return mainWindow->consoleTabulator;
-
+    return new DockTabWidget(this, parent);
 }
 
 bool DockTabWidget::isInsertable(QWidget *widget)

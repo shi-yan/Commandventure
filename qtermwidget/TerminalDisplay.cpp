@@ -899,7 +899,7 @@ void TerminalDisplay::scrollImage(int lines , const QRect& screenWindowRegion)
     Q_ASSERT(scrollRect.isValid() && !scrollRect.isEmpty());
 
     //scroll the display vertically to match internal _image
-    m_miniMap->getCurrentScreenCachedImage()->scroll(0, _fontHeight* (-lines), scrollRect);
+    m_miniMap->scrollImage(0, _fontHeight * (-lines), region);
     scroll( 0 , _fontHeight * (-lines) , scrollRect );
 }
 
@@ -1695,6 +1695,7 @@ void TerminalDisplay::resizeEvent(QResizeEvent *e)
 {
     if (m_miniMap->getCurrentScreenCachedImage()->size() != e->size())
     {
+        *m_miniMap->getHistoryScreenCachedImage() = QPixmap(e->size().width(), 100 * _fontHeight);
         *m_miniMap->getCurrentScreenCachedImage() = QPixmap(e->size().width(), e->size().height());
     }
   updateImageSize();

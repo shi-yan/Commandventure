@@ -276,6 +276,7 @@ void TerminalDisplay::setVTFont(const QFont& f)
   font.setKerning(false);
 
   QWidget::setFont(font);
+
   fontChange(font);
 }
 
@@ -290,7 +291,7 @@ void TerminalDisplay::setFont(const QFont &)
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
-TerminalDisplay::TerminalDisplay(QWidget *parent)
+TerminalDisplay::TerminalDisplay(MinimapNavigator *minimap, QScrollBar *scrollBar, QWidget *parent)
 :QWidget(parent)
 ,_screenWindow(0)
 ,_allowBell(true)
@@ -339,6 +340,8 @@ TerminalDisplay::TerminalDisplay(QWidget *parent)
 ,_filterChain(new TerminalImageFilterChain())
 ,_cursorShape(QTermWidget::BlockCursor)
 ,mMotionAfterPasting(NoMoveScreenWindow)
+,m_miniMap(minimap),
+  _scrollBar(scrollBar)
 {
   // terminal applications are not designed with Right-To-Left in mind,
   // so the layout is forced to Left-To-Right
@@ -352,14 +355,15 @@ TerminalDisplay::TerminalDisplay(QWidget *parent)
 
   // create scroll bar for scrolling output up and down
   // set the scroll bar's slider to occupy the whole area of the scroll bar initially
-  _scrollBar = new QScrollBar(this);
+  //_scrollBar = new QScrollBar(this);
   setScroll(0,0);
   _scrollBar->setCursor( Qt::ArrowCursor );
   connect(_scrollBar, SIGNAL(valueChanged(int)), this,
                         SLOT(scrollBarPositionChanged(int)));
   // qtermwidget: we have to hide it here due the _scrollbarLocation==NoScrollBar
   // check in TerminalDisplay::setScrollBarPosition(ScrollBarPosition position)
-  _scrollBar->hide();
+  //_scrollBar->hide();
+  _scrollBar->show();
 
   // setup timers for blinking cursor and text
   _blinkTimer   = new QTimer(this);
@@ -392,7 +396,12 @@ TerminalDisplay::TerminalDisplay(QWidget *parent)
 
   setLayout( _gridLayout );
 
+ // _gridLayout->addWidget(m_miniMap);
+
   new AutoScrollHandler(this);
+
+
+
 }
 
 TerminalDisplay::~TerminalDisplay()
@@ -890,6 +899,7 @@ void TerminalDisplay::scrollImage(int lines , const QRect& screenWindowRegion)
     Q_ASSERT(scrollRect.isValid() && !scrollRect.isEmpty());
 
     //scroll the display vertically to match internal _image
+    m_miniMap->getCurrentScreenCachedImage()->scroll(0, _fontHeight* (-lines), scrollRect);
     scroll( 0 , _fontHeight * (-lines) , scrollRect );
 }
 
@@ -1245,22 +1255,38 @@ void TerminalDisplay::focusInEvent(QFocusEvent*)
 
 void TerminalDisplay::paintEvent( QPaintEvent* pe )
 {
-  QPainter paint(this);
 
-  foreach (const QRect &rect, (pe->region() & contentsRect()).rects())
+    QPainter cachedImagePainter(m_miniMap->getCurrentScreenCachedImage());
+    cachedImagePainter.setFont(font());
+
+  QVector<QRect> updateRects =  (pe->region() & contentsRect()).rects();
+
+  foreach (const QRect &rect, updateRects)
   {
-    drawBackground(paint,rect,QColor(48,51,61),
+    drawBackground(cachedImagePainter,rect,QColor(48,51,61),
                     true /* use opacity setting */);
 
 
 
-    drawContents(paint, rect);
+    drawContents(cachedImagePainter, rect);
     /*paint.setPen(QColor(Qt::red));
     paint.drawRect(rect);*/
     qDebug() << "repaint rect" << rect;
   }
-  drawInputMethodPreeditString(paint,preeditRect());
-  paintFilters(paint);
+  drawInputMethodPreeditString(cachedImagePainter,preeditRect());
+  paintFilters(cachedImagePainter);
+
+  QPainter paintWidget(this);
+  //m_cacheImage.save("test2.png");
+
+  foreach (const QRect &rect, updateRects)
+  {
+      paintWidget.drawPixmap(rect, *m_miniMap->getCurrentScreenCachedImage(), rect);
+  }
+
+  paintWidget.drawPixmap(preeditRect(), *m_miniMap->getCurrentScreenCachedImage(), preeditRect());
+
+  m_miniMap->update();
 }
 
 QPoint TerminalDisplay::cursorPosition() const
@@ -1665,8 +1691,12 @@ void TerminalDisplay::blinkCursorEvent()
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
-void TerminalDisplay::resizeEvent(QResizeEvent*)
+void TerminalDisplay::resizeEvent(QResizeEvent *e)
 {
+    if (m_miniMap->getCurrentScreenCachedImage()->size() != e->size())
+    {
+        *m_miniMap->getCurrentScreenCachedImage() = QPixmap(e->size().width(), e->size().height());
+    }
   updateImageSize();
   processFilters();
 }

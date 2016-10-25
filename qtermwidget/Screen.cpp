@@ -1319,7 +1319,7 @@ void Screen::addHistLine()
         int oldHistLines = history->getLines();
 
         history->addCellsVector(screenLines[0]);
-        m_minimap->pushLine(screenLines[0]);
+        //m_minimap->pushLine(screenLines[0]);
         history->addLineProperty(lineProperties[0] );
 
         int newHistLines = history->getLines();

@@ -24,6 +24,7 @@
 #include "Filter.h"
 
 class QVBoxLayout;
+class QHBoxLayout;
 struct TermWidgetImpl;
 class SearchBar;
 class StatusBar;
@@ -287,6 +288,7 @@ private:
     TermWidgetImpl * m_impl;
     SearchBar* m_searchBar;
     QVBoxLayout *m_layout;
+    QHBoxLayout *m_hlayout;
 };
 
 

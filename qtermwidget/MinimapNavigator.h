@@ -3,22 +3,23 @@
 
 #include <QWidget>
 #include <QImage>
+#include <QPixmap>
 #include <QPainter>
 #include "Character.h"
 
 class MinimapNavigator : public QWidget
 {
 private:
-    QImage m_minimapImage;
-    QPainter m_painter;
-    unsigned int m_lineCount;
-    QString text;
+    QPixmap m_currentScreenCachedImage;
+
 
 public:
     MinimapNavigator(QWidget *parent = 0);
 
+    QPixmap *getCurrentScreenCachedImage();
 
-    void pushLine(QVector<Konsole::Character> &c);
+protected:
+    void paintEvent(QPaintEvent*);
 };
 
 #endif // MINIMAPNAVIGATOR_H

@@ -34,6 +34,7 @@
 #include "StatusBar.h"
 #include "qtermwidget.h"
 #include <QProcess>
+#include <QScrollBar>
 
 #define STEP_ZOOM 1
 
@@ -49,6 +50,7 @@ struct TermWidgetImpl {
 
     TerminalDisplay *m_terminalDisplay;
     Session *m_session;
+    MinimapNavigator *m_minimap;
 
     Session* createSession(QWidget* parent);
     TerminalDisplay* createTerminalDisplay(Session *session, QWidget* parent);
@@ -57,6 +59,7 @@ struct TermWidgetImpl {
 TermWidgetImpl::TermWidgetImpl(QWidget* parent)
 {
     this->m_session = createSession(parent);
+    this->m_minimap = new MinimapNavigator(parent);
     this->m_terminalDisplay = createTerminalDisplay(this->m_session, parent);
 }
 
@@ -98,7 +101,7 @@ Session *TermWidgetImpl::createSession(QWidget* parent)
 TerminalDisplay *TermWidgetImpl::createTerminalDisplay(Session *session, QWidget* parent)
 {
 //    TerminalDisplay* display = new TerminalDisplay(this);
-    TerminalDisplay* display = new TerminalDisplay(parent);
+    TerminalDisplay* display = new TerminalDisplay(m_minimap, new QScrollBar(parent), parent);
 
     display->setBellMode(TerminalDisplay::NotifyBell);
     display->setTerminalSizeHint(true);
@@ -252,7 +255,15 @@ void QTermWidget::init(int startnow)
 
     m_impl = new TermWidgetImpl(this);
     m_impl->m_terminalDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    m_layout->addWidget(m_impl->m_terminalDisplay);
+    m_layout->addLayout(m_hlayout = new QHBoxLayout());
+
+
+    m_hlayout->addWidget(m_impl->m_terminalDisplay);
+    m_impl->m_minimap->setGeometry(0,0,192,108);
+    m_impl->m_minimap->setFixedWidth(192);
+    m_impl->m_minimap->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
+
+    m_hlayout->addWidget(m_impl->m_minimap);
 
     connect(m_impl->m_session, SIGNAL(bellRequest(QString)), m_impl->m_terminalDisplay, SLOT(bell(QString)));
     connect(m_impl->m_terminalDisplay, SIGNAL(notifyBell(QString)), this, SIGNAL(bell(QString)));
@@ -272,6 +283,11 @@ void QTermWidget::init(int startnow)
     connect(m_searchBar, SIGNAL(findPrevious()), this, SLOT(findPrevious()));
     m_layout->addWidget(m_searchBar);
     m_searchBar->hide();
+
+    //QScrollBar *scrollBar = new QScrollBar(this);
+
+
+
 
     if (startnow && m_impl->m_session) {
         m_impl->m_session->run();

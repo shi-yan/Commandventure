@@ -25,12 +25,14 @@
 #include <QColor>
 #include <QPointer>
 #include <QWidget>
+#include <QPainter>
 
 // Konsole
 #include "Filter.h"
 #include "Character.h"
 #include "qtermwidget.h"
 //#include "konsole_export.h"
+#include "MinimapNavigator.h"
 #define KONSOLEPRIVATE_EXPORT
 
 class QDrag;
@@ -82,7 +84,7 @@ class KONSOLEPRIVATE_EXPORT TerminalDisplay : public QWidget
 
 public:
     /** Constructs a new terminal display widget with the specified parent. */
-    TerminalDisplay(QWidget *parent=0);
+    TerminalDisplay(MinimapNavigator *minimap, QScrollBar *scrollBar, QWidget *parent=0);
     virtual ~TerminalDisplay();
 
     /** Returns the terminal color palette used by the display. */
@@ -811,6 +813,11 @@ private:
     static const int TEXT_BLINK_DELAY = 500;
     static const int DEFAULT_LEFT_MARGIN = 1;
     static const int DEFAULT_TOP_MARGIN = 1;
+
+
+    MinimapNavigator *m_miniMap;
+
+
 
 public:
     static void setTransparencyEnabled(bool enable)

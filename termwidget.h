@@ -4,6 +4,7 @@
 #include "qtermwidget/qtermwidget.h"
 
 #include <QAction>
+#include <QScrollBar>
 
 class TermWidgetHolder;
 

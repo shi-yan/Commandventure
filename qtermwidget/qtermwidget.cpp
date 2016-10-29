@@ -46,21 +46,21 @@ void *createTermWidget(int startnow, void *parent)
 }
 
 struct TermWidgetImpl {
-    TermWidgetImpl(QWidget* parent = 0);
+    TermWidgetImpl(QScrollBar *, QWidget* parent = 0);
 
     TerminalDisplay *m_terminalDisplay;
     Session *m_session;
     MinimapNavigator *m_minimap;
 
     Session* createSession(QWidget* parent);
-    TerminalDisplay* createTerminalDisplay(Session *session, QWidget* parent);
+    TerminalDisplay* createTerminalDisplay(Session *session, QScrollBar *scrollbar, QWidget* parent);
 };
 
-TermWidgetImpl::TermWidgetImpl(QWidget* parent)
+TermWidgetImpl::TermWidgetImpl(QScrollBar *scrollbar, QWidget* parent)
 {
     this->m_session = createSession(parent);
     this->m_minimap = new MinimapNavigator(parent);
-    this->m_terminalDisplay = createTerminalDisplay(this->m_session, parent);
+    this->m_terminalDisplay = createTerminalDisplay(this->m_session, scrollbar, parent);
 }
 
 
@@ -98,10 +98,10 @@ Session *TermWidgetImpl::createSession(QWidget* parent)
     return session;
 }
 
-TerminalDisplay *TermWidgetImpl::createTerminalDisplay(Session *session, QWidget* parent)
+TerminalDisplay *TermWidgetImpl::createTerminalDisplay(Session *session, QScrollBar *scrollbar, QWidget* parent)
 {
 //    TerminalDisplay* display = new TerminalDisplay(this);
-    TerminalDisplay* display = new TerminalDisplay(m_minimap, new QScrollBar(parent), parent);
+    TerminalDisplay* display = new TerminalDisplay(m_minimap, scrollbar, parent);
 
     display->setBellMode(TerminalDisplay::NotifyBell);
     display->setTerminalSizeHint(true);
@@ -247,13 +247,14 @@ void QTermWidget::startTerminalTeletype()
 void QTermWidget::init(int startnow)
 {
     m_layout = new QVBoxLayout();
-    m_layout->setMargin(20);
+    m_layout->setMargin(0);
     setLayout(m_layout);
+    m_scrollbar = new QScrollBar(this);
 
     setAutoFillBackground(true);
     m_layout->setSpacing(0);
 
-    m_impl = new TermWidgetImpl(this);
+    m_impl = new TermWidgetImpl(m_scrollbar, this);
     m_impl->m_terminalDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     m_layout->addLayout(m_hlayout = new QHBoxLayout());
 
@@ -265,6 +266,7 @@ void QTermWidget::init(int startnow)
 
     m_hlayout->addWidget(m_impl->m_minimap);
 
+    m_hlayout->addWidget(m_scrollbar);
 
     connect(m_impl->m_session, SIGNAL(bellRequest(QString)), m_impl->m_terminalDisplay, SLOT(bell(QString)));
     connect(m_impl->m_terminalDisplay, SIGNAL(notifyBell(QString)), this, SIGNAL(bell(QString)));
@@ -285,7 +287,6 @@ void QTermWidget::init(int startnow)
     m_layout->addWidget(m_searchBar);
     m_searchBar->hide();
 
-    //QScrollBar *scrollBar = new QScrollBar(this);
 
 
 

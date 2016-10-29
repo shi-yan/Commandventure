@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "Filter.h"
+#include <QScrollBar>
 
 class QVBoxLayout;
 class QHBoxLayout;
@@ -267,6 +268,7 @@ private:
     void init(int startnow);
     void showInGraphicalShell(QString &pathIn);
     TermWidgetImpl * m_impl;
+    QScrollBar *m_scrollbar;
     SearchBar* m_searchBar;
     QVBoxLayout *m_layout;
     QHBoxLayout *m_hlayout;

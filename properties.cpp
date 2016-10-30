@@ -21,7 +21,7 @@
 #include "properties.h"
 #include "config.h"
 
-#define STR_VERSION "Micemallow"
+#define STR_VERSION "Commandventure"
 
 Properties * Properties::m_instance = 0;
 

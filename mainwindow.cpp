@@ -30,7 +30,7 @@
 #include "bookmarkswidget.h"
 #include "qtermwidget/StatusBar.h"
 
-#define STR_VERSION "Micemallow"
+#define STR_VERSION "Commandventure"
 
 
 // TODO/FXIME: probably remove. QSS makes it unusable on mac...
@@ -538,7 +538,7 @@ void MainWindow::setupCustomDirs()
 {
     const QSettings settings;
     const QString dir = QFileInfo(settings.fileName()).canonicalPath() + "/color-schemes/";
-    TermWidgetImpl::addCustomColorSchemeDir("/home/shiy/Micemallow/qtermwidget/color-schemes");
+    TermWidgetImpl::addCustomColorSchemeDir("/home/shiy/Commandventure/qtermwidget/color-schemes");
 }
 
 void MainWindow::on_consoleTabulator_currentChanged(int)
@@ -780,6 +780,6 @@ void MainWindow::onCurrentTitleChanged(int index)
     }
     //setWindowTitle(title.isEmpty() || !Properties::Instance()->changeWindowTitle ? QStringLiteral("QTerminal") : title);
     //setWindowIcon(icon.isNull() || !Properties::Instance()->changeWindowIcon ? QIcon::fromTheme("utilities-terminal") : icon);
-    setWindowTitle(QStringLiteral("Micemallow"));
+    setWindowTitle(QStringLiteral("Commandventure"));
     setWindowIcon(QIcon::fromTheme("utilities-terminal"));
 }

@@ -8,13 +8,13 @@ QT       += core gui x11extras
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = Micemallow
+TARGET = Commandventure
 TEMPLATE = app
 
 DEFINES += HAVE_POSIX_OPENPT
 
 
-SOURCES += main.cpp\
+SOURCES += main.cpp\f
         mainwindow.cpp \
     bookmarkswidget.cpp \
     fontdialog.cpp \
@@ -108,7 +108,7 @@ RESOURCES += \
     icons.qrc
 
 DISTFILES += \
-    Micemallow.pro.user \
+    Commandventure.pro.user \
     qtermwidget/LineFont.src \
     qtermwidget/default.keytab \
     qtermwidget/README \

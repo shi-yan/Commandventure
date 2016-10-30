@@ -8,5 +8,5 @@ before_install:
 
 script:
   - qmake -qt=qt5 -v
-  - qmake -qt=qt5 Commandventure.pro
+  - qmake -qt=qt5
   - make

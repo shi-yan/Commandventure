@@ -14,7 +14,7 @@ TEMPLATE = app
 DEFINES += HAVE_POSIX_OPENPT
 
 
-SOURCES += main.cpp\f
+SOURCES += main.cpp \
         mainwindow.cpp \
     bookmarkswidget.cpp \
     fontdialog.cpp \

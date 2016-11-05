@@ -86,12 +86,6 @@ public:
     void setOpacity(qreal opacity);
 
     /**
-     * Specifies whether the terminal display has a vertical scroll bar, and if so whether it
-     * is shown on the left or right side of the display.
-     */
-    void setScrollBarPosition(QTermWidget::ScrollBarPosition position);
-
-    /**
      * Sets the current position and range of the display's scroll bar.
      *
      * @param cursor The position of the scroll bar's thumb.
@@ -726,7 +720,6 @@ private:
 
     QClipboard*  _clipboard;
     QScrollBar* _scrollBar;
-    QTermWidget::ScrollBarPosition _scrollbarLocation;
     QString     _wordCharacters;
     int         _bellMode;
 

@@ -17,18 +17,6 @@ class QTermWidget : public QWidget {
 public:
 
     /**
-     * This enum describes the location where the scroll bar is positioned in the display widget.
-     */
-    enum ScrollBarPosition {
-        /** Do not show the scroll bar. */
-        NoScrollBar = 0,
-        /** Show the scroll bar on the left side of the display. */
-        ScrollBarLeft = 1,
-        /** Show the scroll bar on the right side of the display. */
-        ScrollBarRight = 2
-    };
-
-    /**
      * This enum describes the available shapes for the keyboard cursor.
      * See setKeyboardCursorShape()
      */
@@ -108,9 +96,6 @@ public:
 
     // History size for scrolling
     void setHistorySize(int lines); //infinite if lines < 0
-
-    // Presence of scrollbar
-    void setScrollBarPosition(ScrollBarPosition);
 
     // Wrapped, scroll to end.
     void scrollToEnd();

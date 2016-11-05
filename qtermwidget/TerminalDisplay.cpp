@@ -318,7 +318,6 @@ TerminalDisplay::TerminalDisplay(MinimapNavigator *minimap, QScrollBar *scrollBa
 ,_lineSelectionMode(false)
 ,_preserveLineBreaks(false)
 ,_columnSelectionMode(false)
-,_scrollbarLocation(QTermWidget::NoScrollBar)
 ,_wordCharacters(":@-./_~")
 ,_bellMode(SystemBeepBell)
 ,_blinking(false)
@@ -845,16 +844,9 @@ void TerminalDisplay::scrollImage(int lines , const QRect& screenWindowRegion)
     int scrollBarWidth = _scrollBar->isHidden() ? 0 : _scrollBar->width();
     const int SCROLLBAR_CONTENT_GAP = 1;
     QRect scrollRect;
-    if ( _scrollbarLocation == QTermWidget::ScrollBarLeft )
-    {
-        scrollRect.setLeft(scrollBarWidth+SCROLLBAR_CONTENT_GAP);
-        scrollRect.setRight(width());
-    }
-    else
-    {
-        scrollRect.setLeft(0);
-        scrollRect.setRight(width() - scrollBarWidth - SCROLLBAR_CONTENT_GAP);
-    }
+    scrollRect.setLeft(0);
+    scrollRect.setRight(width() - SCROLLBAR_CONTENT_GAP);
+
     void* firstCharPos = &_image[ region.top() * this->_columns ];
     void* lastCharPos = &_image[ (region.top() + abs(lines)) * this->_columns ];
 
@@ -1341,7 +1333,7 @@ void TerminalDisplay::paintFilters(QPainter& painter)
     QPoint cursorPos = mapFromGlobal(QCursor::pos());
     int cursorLine;
     int cursorColumn;
-    int scrollBarWidth = (_scrollbarLocation == QTermWidget::ScrollBarLeft) ? _scrollBar->width() : 0;
+    int scrollBarWidth = 0;
 
     getCharacterPosition( cursorPos , cursorLine , cursorColumn );
     Character cursorCharacter = _image[loc(cursorColumn,cursorLine)];
@@ -1821,23 +1813,6 @@ void TerminalDisplay::scrollToEnd()
   _screenWindow->setTrackOutput( _screenWindow->atEndOfOutput() );
 }
 
-void TerminalDisplay::setScrollBarPosition(QTermWidget::ScrollBarPosition position)
-{
-  if (_scrollbarLocation == position)
-      return;
-
-  if ( position == QTermWidget::NoScrollBar )
-     _scrollBar->hide();
-  else
-     _scrollBar->show();
-
-  _topMargin = _leftMargin = 1;
-  _scrollbarLocation = position;
-
-  propagateSize();
-  update();
-}
-
 void TerminalDisplay::mousePressEvent(QMouseEvent* ev)
 {
   if ( _possibleTripleClick && (ev->button()==Qt::LeftButton) ) {
@@ -1931,7 +1906,7 @@ void TerminalDisplay::mouseMoveEvent(QMouseEvent* ev)
 {
   int charLine = 0;
   int charColumn = 0;
-  int scrollBarWidth = (_scrollbarLocation == QTermWidget::ScrollBarLeft) ? _scrollBar->width() : 0;
+  int scrollBarWidth = 0;
 
   getCharacterPosition(ev->pos(),charLine,charColumn);
 
@@ -2958,23 +2933,9 @@ void TerminalDisplay::clearImage()
 void TerminalDisplay::calcGeometry()
 {
   _scrollBar->resize(_scrollBar->sizeHint().width(), contentsRect().height());
-  switch(_scrollbarLocation)
-  {
-    case QTermWidget::NoScrollBar :
-     _leftMargin = DEFAULT_LEFT_MARGIN;
-     _contentWidth = contentsRect().width() - 2 * DEFAULT_LEFT_MARGIN;
-     break;
-    case QTermWidget::ScrollBarLeft :
-     _leftMargin = DEFAULT_LEFT_MARGIN + _scrollBar->width();
-     _contentWidth = contentsRect().width() - 2 * DEFAULT_LEFT_MARGIN - _scrollBar->width();
-     _scrollBar->move(contentsRect().topLeft());
-     break;
-    case QTermWidget::ScrollBarRight:
-     _leftMargin = DEFAULT_LEFT_MARGIN;
-     _contentWidth = contentsRect().width()  - 2 * DEFAULT_LEFT_MARGIN - _scrollBar->width();
-     _scrollBar->move(contentsRect().topRight() - QPoint(_scrollBar->width()-1,0));
-     break;
-  }
+  _leftMargin = DEFAULT_LEFT_MARGIN;
+  _contentWidth = contentsRect().width()  - 2 * DEFAULT_LEFT_MARGIN;
+
 
   _topMargin = DEFAULT_TOP_MARGIN;
   _contentHeight = contentsRect().height() - 2 * DEFAULT_TOP_MARGIN + /* mysterious */ 1;

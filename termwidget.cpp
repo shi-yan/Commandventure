@@ -94,20 +94,6 @@ void TermWidgetImpl::propertiesChanged()
     setKeyBindings(Properties::Instance()->emulation);
     setTerminalOpacity(1.0 - Properties::Instance()->termTransparency/100.0);
 
-    /* be consequent with qtermwidget.h here */
-    switch(Properties::Instance()->scrollBarPos) {
-    case 0:
-        setScrollBarPosition(QTermWidget::NoScrollBar);
-        break;
-    case 1:
-        setScrollBarPosition(QTermWidget::ScrollBarLeft);
-        break;
-    case 2:
-    default:
-        setScrollBarPosition(QTermWidget::ScrollBarRight);
-        break;
-    }
-
     switch(Properties::Instance()->keyboardCursorShape) {
     case 1:
         setKeyboardCursorShape(QTermWidget::UnderlineCursor);

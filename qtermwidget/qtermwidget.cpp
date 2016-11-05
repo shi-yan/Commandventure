@@ -317,7 +317,6 @@ void QTermWidget::init(int startnow)
     setTerminalFont(font);
     m_searchBar->setFont(font);
 
-    setScrollBarPosition(NoScrollBar);
     setKeyboardCursorShape(BlockCursor);
 
     m_impl->m_session->addView(m_impl->m_terminalDisplay);
@@ -474,13 +473,6 @@ void QTermWidget::setHistorySize(int lines)
         m_impl->m_session->setHistoryType(HistoryTypeFile());
     else
         m_impl->m_session->setHistoryType(HistoryTypeBuffer(lines));
-}
-
-void QTermWidget::setScrollBarPosition(ScrollBarPosition pos)
-{
-    if (!m_impl->m_terminalDisplay)
-        return;
-    m_impl->m_terminalDisplay->setScrollBarPosition(pos);
 }
 
 void QTermWidget::scrollToEnd()

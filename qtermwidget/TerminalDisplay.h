@@ -62,7 +62,7 @@ class KONSOLEPRIVATE_EXPORT TerminalDisplay : public QWidget
 
 public:
     /** Constructs a new terminal display widget with the specified parent. */
-    TerminalDisplay(MinimapNavigator *minimap, QScrollBar *scrollBar, QWidget *parent=0);
+    TerminalDisplay(QScrollBar *scrollBar, QWidget *parent=0);
     virtual ~TerminalDisplay();
 
     /** Returns the terminal color palette used by the display. */
@@ -786,7 +786,7 @@ private:
     static const int DEFAULT_TOP_MARGIN = 1;
 
 
-    MinimapNavigator *m_miniMap;
+    //MinimapNavigator *m_miniMap;
 
 
 

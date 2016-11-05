@@ -48,7 +48,7 @@ struct TermWidgetImpl {
 
     TerminalDisplay *m_terminalDisplay;
     Session *m_session;
-    MinimapNavigator *m_minimap;
+    TerminalDisplay *m_minimap;
 
     Session* createSession(QWidget* parent);
     TerminalDisplay* createTerminalDisplay(Session *session, QScrollBar *scrollbar, QWidget* parent);
@@ -57,8 +57,10 @@ struct TermWidgetImpl {
 TermWidgetImpl::TermWidgetImpl(QScrollBar *scrollbar, QWidget* parent)
 {
     this->m_session = createSession(parent);
-    this->m_minimap = new MinimapNavigator(parent);
+    this->m_minimap = createTerminalDisplay(this->m_session, NULL, parent);
+
     this->m_terminalDisplay = createTerminalDisplay(this->m_session, scrollbar, parent);
+
 }
 
 
@@ -99,7 +101,7 @@ Session *TermWidgetImpl::createSession(QWidget* parent)
 TerminalDisplay *TermWidgetImpl::createTerminalDisplay(Session *session, QScrollBar *scrollbar, QWidget* parent)
 {
 //    TerminalDisplay* display = new TerminalDisplay(this);
-    TerminalDisplay* display = new TerminalDisplay(m_minimap, scrollbar, parent);
+    TerminalDisplay* display = new TerminalDisplay(scrollbar, parent);
 
     display->setBellMode(TerminalDisplay::NotifyBell);
     display->setTerminalSizeHint(true);
@@ -318,6 +320,7 @@ void QTermWidget::init(int startnow)
     setKeyboardCursorShape(BlockCursor);
 
     m_impl->m_session->addView(m_impl->m_terminalDisplay);
+    m_impl->m_session->addView(m_impl->m_minimap);
 
     connect(m_impl->m_session, SIGNAL(resizeRequest(QSize)), this, SLOT(setSize(QSize)));
     connect(m_impl->m_session, SIGNAL(finished()), this, SLOT(sessionFinished()));

@@ -157,10 +157,6 @@ void TerminalDisplay::setBackgroundColor(const QColor& color)
     QPalette p = palette();
       p.setColor( backgroundRole(), color );
       setPalette( p );
-
-      // Avoid propagating the palette change to the scroll bar
-      _scrollBar->setPalette( QApplication::palette() );
-
     update();
 }
 void TerminalDisplay::setForegroundColor(const QColor& color)
@@ -289,7 +285,7 @@ void TerminalDisplay::setFont(const QFont &)
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
-TerminalDisplay::TerminalDisplay(MinimapNavigator *minimap, QScrollBar *scrollBar, QWidget *parent)
+TerminalDisplay::TerminalDisplay(QScrollBar *scrollBar, QWidget *parent)
 :QWidget(parent)
 ,_screenWindow(0)
 ,_allowBell(true)
@@ -337,8 +333,7 @@ TerminalDisplay::TerminalDisplay(MinimapNavigator *minimap, QScrollBar *scrollBa
 ,_filterChain(new TerminalImageFilterChain())
 ,_cursorShape(QTermWidget::BlockCursor)
 ,mMotionAfterPasting(NoMoveScreenWindow)
-,m_miniMap(minimap),
-  _scrollBar(scrollBar)
+,_scrollBar(scrollBar)
 {
   // terminal applications are not designed with Right-To-Left in mind,
   // so the layout is forced to Left-To-Right
@@ -354,14 +349,11 @@ TerminalDisplay::TerminalDisplay(MinimapNavigator *minimap, QScrollBar *scrollBa
   // set the scroll bar's slider to occupy the whole area of the scroll bar initially
   //_scrollBar = new QScrollBar(this);
   setScroll(0,0);
-  _scrollBar->setCursor( Qt::ArrowCursor );
+  if (_scrollBar){
   connect(_scrollBar, SIGNAL(valueChanged(int)), this,
                         SLOT(scrollBarPositionChanged(int)));
-  // qtermwidget: we have to hide it here due the _scrollbarLocation==NoScrollBar
-  // check in TerminalDisplay::setScrollBarPosition(ScrollBarPosition position)
-  //_scrollBar->hide();
   _scrollBar->show();
-
+    }
   // setup timers for blinking cursor and text
   _blinkTimer   = new QTimer(this);
   connect(_blinkTimer, SIGNAL(timeout()), this, SLOT(blinkEvent()));
@@ -614,10 +606,8 @@ void TerminalDisplay::drawBackground(QPainter& painter, const QRect& rect, const
         // being outside of the terminal display and visual consistency with other KDE
         // applications.
         //
-        QRect scrollBarArea = _scrollBar->isVisible() ?
-                                    rect.intersected(_scrollBar->geometry()) :
-                                    QRect();
-        QRegion contentsRegion = QRegion(rect).subtracted(scrollBarArea);
+
+        QRegion contentsRegion = QRegion(rect);
         QRect contentsRect = contentsRegion.boundingRect();
 
         if ( HAVE_TRANSPARENCY && qAlpha(_blendColor) < 0xff && useOpacitySetting )
@@ -632,8 +622,6 @@ void TerminalDisplay::drawBackground(QPainter& painter, const QRect& rect, const
         }
         else
             painter.fillRect(contentsRect, backgroundColor);
-
-        painter.fillRect(scrollBarArea,_scrollBar->palette().background());
 }
 
 void TerminalDisplay::drawCursor(QPainter& painter,
@@ -839,7 +827,6 @@ void TerminalDisplay::scrollImage(int lines , const QRect& screenWindowRegion)
     // Set the QT_FLUSH_PAINT environment variable to '1' before starting the
     // application to monitor repainting.
     //
-    int scrollBarWidth = _scrollBar->isHidden() ? 0 : _scrollBar->width();
     const int SCROLLBAR_CONTENT_GAP = 1;
     QRect scrollRect;
     scrollRect.setLeft(0);
@@ -889,7 +876,7 @@ void TerminalDisplay::scrollImage(int lines , const QRect& screenWindowRegion)
     Q_ASSERT(scrollRect.isValid() && !scrollRect.isEmpty());
 
     //scroll the display vertically to match internal _image
-    m_miniMap->scrollImage(0, _fontHeight * (-lines), region);
+    //m_miniMap->scrollImage(0, _fontHeight * (-lines), region);
     scroll( 0 , _fontHeight * (-lines) , scrollRect );
 }
 
@@ -1089,8 +1076,8 @@ void TerminalDisplay::updateImage()
     if (_lineProperties.count() > y)
         updateLine |= (_lineProperties[y].property & LINE_DOUBLEHEIGHT);
 
-    if (_oldLineProperties[y].commandCount != _lineProperties[y].commandCount
-            || _oldLineProperties[y].property != _lineProperties[y].property)
+    if (y<_oldLineProperties.count()&& (_oldLineProperties[y].commandCount != _lineProperties[y].commandCount
+            || _oldLineProperties[y].property != _lineProperties[y].property))
     {
         //qDebug() << "oldline";
         _oldLineProperties[y] = _lineProperties[y];
@@ -1245,38 +1232,39 @@ void TerminalDisplay::focusInEvent(QFocusEvent*)
 
 void TerminalDisplay::paintEvent( QPaintEvent* pe )
 {
+    QPainter painter(this);
 
-    QPainter cachedImagePainter(m_miniMap->getCurrentScreenCachedImage());
+    /*QPainter cachedImagePainter(m_miniMap->getCurrentScreenCachedImage());
     cachedImagePainter.setFont(font());
-
+*/
   QVector<QRect> updateRects =  (pe->region() & contentsRect()).rects();
 
   foreach (const QRect &rect, updateRects)
   {
-    drawBackground(cachedImagePainter,rect,QColor(48,51,61),
+    drawBackground(painter,rect,QColor(48,51,61),
                     true /* use opacity setting */);
 
 
 
-    drawContents(cachedImagePainter, rect);
+    drawContents(painter, rect);
     /*paint.setPen(QColor(Qt::red));
     paint.drawRect(rect);*/
     qDebug() << "repaint rect" << rect;
   }
-  drawInputMethodPreeditString(cachedImagePainter,preeditRect());
-  paintFilters(cachedImagePainter);
+  drawInputMethodPreeditString(painter,preeditRect());
+  paintFilters(painter);
 
-  QPainter paintWidget(this);
+  //QPainter paintWidget(this);
   //m_cacheImage.save("test2.png");
 
-  foreach (const QRect &rect, updateRects)
+  /*foreach (const QRect &rect, updateRects)
   {
       paintWidget.drawPixmap(rect, *m_miniMap->getCurrentScreenCachedImage(), rect);
   }
 
   paintWidget.drawPixmap(preeditRect(), *m_miniMap->getCurrentScreenCachedImage(), preeditRect());
-
-  m_miniMap->update();
+*/
+  //m_miniMap->update();
 }
 
 QPoint TerminalDisplay::cursorPosition() const
@@ -1683,11 +1671,11 @@ void TerminalDisplay::blinkCursorEvent()
 
 void TerminalDisplay::resizeEvent(QResizeEvent *e)
 {
-    if (m_miniMap->getCurrentScreenCachedImage()->size() != e->size())
+    /*if (m_miniMap->getCurrentScreenCachedImage()->size() != e->size())
     {
         *m_miniMap->getHistoryScreenCachedImage() = QPixmap(e->size().width(), 100 * _fontHeight);
         *m_miniMap->getCurrentScreenCachedImage() = QPixmap(e->size().width(), e->size().height());
-    }
+    }*/
   updateImageSize();
   processFilters();
 }
@@ -1786,6 +1774,9 @@ void TerminalDisplay::setScroll(int cursor, int slines)
   //
   // setting the range or value of a _scrollBar will always trigger
   // a repaint, so it should be avoided if it is not necessary
+    if(!_scrollBar)
+        return;
+
   if ( _scrollBar->minimum() == 0                 &&
        _scrollBar->maximum() == (slines - _lines) &&
        _scrollBar->value()   == cursor )
@@ -2856,7 +2847,6 @@ bool TerminalDisplay::event(QEvent* event)
         break;
     case QEvent::PaletteChange:
     case QEvent::ApplicationPaletteChange:
-        _scrollBar->setPalette( QApplication::palette() );
         break;
     default:
         break;
@@ -2932,7 +2922,6 @@ void TerminalDisplay::clearImage()
 
 void TerminalDisplay::calcGeometry()
 {
-  _scrollBar->resize(_scrollBar->sizeHint().width(), contentsRect().height());
   _leftMargin = DEFAULT_LEFT_MARGIN;
   _contentWidth = contentsRect().width()  - 2 * DEFAULT_LEFT_MARGIN;
 

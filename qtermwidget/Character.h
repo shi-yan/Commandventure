@@ -7,9 +7,6 @@
 // Local
 #include "CharacterColor.h"
 
-namespace Konsole
-{
-
 struct LineProperty {
     unsigned int commandCount;
     unsigned char property;
@@ -199,8 +196,7 @@ private:
     QHash<ushort,ushort*> extendedCharTable;
 };
 
-}
-Q_DECLARE_TYPEINFO(Konsole::Character, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(Character, Q_MOVABLE_TYPE);
 
 #endif // CHARACTER_H
 

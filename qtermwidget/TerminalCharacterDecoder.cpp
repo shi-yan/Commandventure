@@ -31,7 +31,6 @@
 // Konsole
 #include "konsole_wcwidth.h"
 
-using namespace Konsole;
 PlainTextDecoder::PlainTextDecoder()
  : _output(0)
  , _includeTrailingWhitespace(true)

@@ -18,7 +18,7 @@
 */
 
 // Own
-#include "ScreenWindow.h"
+#include "MinimapWindow.h"
 
 // Qt
 #include <QtDebug>
@@ -26,7 +26,7 @@
 // Konsole
 #include "Screen.h"
 
-ScreenWindow::ScreenWindow(QObject* parent)
+MinimapWindow::MinimapWindow(QObject* parent)
     : QObject(parent)
     , _windowBuffer(0)
     , _windowBufferSize(0)
@@ -38,24 +38,24 @@ ScreenWindow::ScreenWindow(QObject* parent)
 {
 }
 
-ScreenWindow::~ScreenWindow()
+MinimapWindow::~MinimapWindow()
 {
     delete[] _windowBuffer;
 }
 
-void ScreenWindow::setScreen(Screen* screen)
+void MinimapWindow::setScreen(Screen* screen)
 {
     Q_ASSERT( screen );
 
     _screen = screen;
 }
 
-Screen* ScreenWindow::screen() const
+Screen* MinimapWindow::screen() const
 {
     return _screen;
 }
 
-Character* ScreenWindow::getImage()
+Character* MinimapWindow::getImage()
 {
     // reallocate internal buffer if the window size has changed
     int size = windowLines() * windowColumns();
@@ -82,7 +82,7 @@ Character* ScreenWindow::getImage()
     return _windowBuffer;
 }
 
-void ScreenWindow::fillUnusedArea()
+void MinimapWindow::fillUnusedArea()
 {
     int screenEndLine = _screen->getHistLines() + _screen->getLines() - 1;
     int windowEndLine = currentLine() + windowLines() - 1;
@@ -100,13 +100,13 @@ void ScreenWindow::fillUnusedArea()
 // when passing a line number to a Screen method, the line number should
 // never be more than endWindowLine()
 //
-int ScreenWindow::endWindowLine() const
+int MinimapWindow::endWindowLine() const
 {
     return qMin(currentLine() + windowLines() - 1,
                 lineCount() - 1);
 }
 
-QVector<LineProperty> ScreenWindow::getLineProperties()
+QVector<LineProperty> MinimapWindow::getLineProperties()
 {
     QVector<LineProperty> result = _screen->getLineProperties(currentLine(),endWindowLine());
 
@@ -116,24 +116,24 @@ QVector<LineProperty> ScreenWindow::getLineProperties()
     return result;
 }
 
-QString ScreenWindow::selectedText( bool preserveLineBreaks ) const
+QString MinimapWindow::selectedText( bool preserveLineBreaks ) const
 {
     return _screen->selectedText( preserveLineBreaks );
 }
 
-void ScreenWindow::getSelectionStart( int& column , int& line )
+void MinimapWindow::getSelectionStart( int& column , int& line )
 {
     _screen->getSelectionStart(column,line);
     line -= currentLine();
 }
 
-void ScreenWindow::getSelectionEnd( int& column , int& line )
+void MinimapWindow::getSelectionEnd( int& column , int& line )
 {
     _screen->getSelectionEnd(column,line);
     line -= currentLine();
 }
 
-void ScreenWindow::setSelectionStart( int column , int line , bool columnMode )
+void MinimapWindow::setSelectionStart( int column , int line , bool columnMode )
 {
     _screen->setSelectionStart( column , qMin(line + currentLine(),endWindowLine())  , columnMode);
 
@@ -141,7 +141,7 @@ void ScreenWindow::setSelectionStart( int column , int line , bool columnMode )
     emit selectionChanged();
 }
 
-void ScreenWindow::setSelectionEnd( int column , int line )
+void MinimapWindow::setSelectionEnd( int column , int line )
 {
     _screen->setSelectionEnd( column , qMin(line + currentLine(),endWindowLine()) );
 
@@ -149,45 +149,45 @@ void ScreenWindow::setSelectionEnd( int column , int line )
     emit selectionChanged();
 }
 
-bool ScreenWindow::isSelected( int column , int line )
+bool MinimapWindow::isSelected( int column , int line )
 {
     return _screen->isSelected( column , qMin(line + currentLine(),endWindowLine()) );
 }
 
-void ScreenWindow::clearSelection()
+void MinimapWindow::clearSelection()
 {
     _screen->clearSelection();
 
     emit selectionChanged();
 }
 
-void ScreenWindow::setWindowLines(int lines)
+void MinimapWindow::setWindowLines(int lines)
 {
     Q_ASSERT(lines > 0);
     _windowLines = lines;
 }
 
-int ScreenWindow::windowLines() const
+int MinimapWindow::windowLines() const
 {
     return _windowLines;
 }
 
-int ScreenWindow::windowColumns() const
+int MinimapWindow::windowColumns() const
 {
     return _screen->getColumns();
 }
 
-int ScreenWindow::lineCount() const
+int MinimapWindow::lineCount() const
 {
     return _screen->getHistLines() + _screen->getLines();
 }
 
-int ScreenWindow::columnCount() const
+int MinimapWindow::columnCount() const
 {
     return _screen->getColumns();
 }
 
-QPoint ScreenWindow::cursorPosition() const
+QPoint MinimapWindow::cursorPosition() const
 {
     QPoint position;
 
@@ -197,12 +197,12 @@ QPoint ScreenWindow::cursorPosition() const
     return position;
 }
 
-int ScreenWindow::currentLine() const
+int MinimapWindow::currentLine() const
 {
     return qBound(0,_currentLine,lineCount()-windowLines());
 }
 
-void ScreenWindow::scrollBy( RelativeScrollMode mode , int amount )
+void MinimapWindow::scrollBy( RelativeScrollMode mode , int amount )
 {
     if ( mode == ScrollLines )
     {
@@ -214,12 +214,12 @@ void ScreenWindow::scrollBy( RelativeScrollMode mode , int amount )
     }
 }
 
-bool ScreenWindow::atEndOfOutput() const
+bool MinimapWindow::atEndOfOutput() const
 {
     return currentLine() == (lineCount()-windowLines());
 }
 
-void ScreenWindow::scrollTo( int line )
+void MinimapWindow::scrollTo( int line )
 {
     int maxCurrentLineNumber = lineCount() - windowLines();
     line = qBound(0,line,maxCurrentLineNumber);
@@ -236,27 +236,27 @@ void ScreenWindow::scrollTo( int line )
     emit scrolled(_currentLine);
 }
 
-void ScreenWindow::setTrackOutput(bool trackOutput)
+void MinimapWindow::setTrackOutput(bool trackOutput)
 {
     _trackOutput = trackOutput;
 }
 
-bool ScreenWindow::trackOutput() const
+bool MinimapWindow::trackOutput() const
 {
     return _trackOutput;
 }
 
-int ScreenWindow::scrollCount() const
+int MinimapWindow::scrollCount() const
 {
     return _scrollCount;
 }
 
-void ScreenWindow::resetScrollCount()
+void MinimapWindow::resetScrollCount()
 {
     _scrollCount = 0;
 }
 
-QRect ScreenWindow::scrollRegion() const
+QRect MinimapWindow::scrollRegion() const
 {
     bool equalToScreenSize = windowLines() == _screen->getLines();
 
@@ -266,7 +266,7 @@ QRect ScreenWindow::scrollRegion() const
         return QRect(0,0,windowColumns(),windowLines());
 }
 
-void ScreenWindow::notifyOutputChanged()
+void MinimapWindow::notifyOutputChanged()
 {
     // move window to the bottom of the screen and update scroll count
     // if this window is currently tracking the bottom of the screen

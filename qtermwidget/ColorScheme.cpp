@@ -40,8 +40,6 @@
 //#include <KConfigGroup>
 //#include <KStandardDirs>
 
-using namespace Konsole;
-
 const ColorEntry ColorScheme::defaultTable[TABLE_COLORS] =
  // The following are almost IBM standard color codes, with some slight
  // gamma correction for the dim colors to compensate for bright X screens.

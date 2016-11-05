@@ -26,8 +26,6 @@
 #include <cstdlib>
 
 
-using namespace Konsole;
-
 // expands environment variables in 'text'
 // function copied from kdelibs/kio/kio/kurlcompletion.cpp
 static bool expandEnv(QString & text);

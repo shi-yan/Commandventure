@@ -12,7 +12,7 @@ private:
 public:
     HistoryMinimap();
 
-    void pushLine(QVector<Konsole::Character > &line);
+    void pushLine(QVector<Character > &line);
 
 };
 

@@ -10,8 +10,6 @@
 // KDE
 #include "kptyprocess.h"
 
-namespace Konsole {
-
 /**
  * The Pty class is used to start the terminal process,
  * send data to it, receive data from it and manipulate
@@ -178,7 +176,5 @@ Q_OBJECT
     bool _xonXoff;
     bool _utf8;
 };
-
-}
 
 #endif // PTY_H

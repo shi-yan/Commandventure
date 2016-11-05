@@ -15,9 +15,6 @@
 class QIODevice;
 //class KConfig;
 
-namespace Konsole
-{
-
 /**
  * Represents a color scheme for a terminal display.
  *
@@ -337,8 +334,6 @@ private:
     static const ColorScheme _defaultColorScheme;
 };
 
-}
-
-Q_DECLARE_METATYPE(const Konsole::ColorScheme*)
+Q_DECLARE_METATYPE(const ColorScheme*)
 
 #endif //COLORSCHEME_H

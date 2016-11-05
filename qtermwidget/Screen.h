@@ -21,9 +21,6 @@
 
 class MinimapNavigator;
 
-namespace Konsole
-{
-
 class TerminalCharacterDecoder;
 
 /**
@@ -654,7 +651,5 @@ private:
 
     static Character defaultChar;
 };
-
-}
 
 #endif // SCREEN_H

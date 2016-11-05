@@ -42,9 +42,6 @@
 //#include <KLocale>
 //#include <KStandardDirs>
 
-using namespace Konsole;
-
-
 const QByteArray KeyboardTranslatorManager::defaultTranslatorText(
 "keyboard \"Fallback Key Translator\"\n"
 "key Tab : \"\\t\""

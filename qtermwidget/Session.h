@@ -8,8 +8,6 @@
 
 class KProcess;
 
-namespace Konsole {
-
 class Emulation;
 class Pty;
 class TerminalDisplay;
@@ -623,7 +621,5 @@ private:
 
     int _masterMode;
 };
-
-}
 
 #endif

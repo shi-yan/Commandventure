@@ -42,8 +42,6 @@
 #include "TerminalCharacterDecoder.h"
 #include "konsole_wcwidth.h"
 
-using namespace Konsole;
-
 FilterChain::~FilterChain()
 {
     QMutableListIterator<Filter*> iter(*this);

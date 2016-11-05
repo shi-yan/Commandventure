@@ -53,7 +53,8 @@ SOURCES += main.cpp \
     qtermwidget/StatusBar.cpp \
     docktabwidget.cpp \
     qtermwidget/MinimapNavigator.cpp \
-    qtermwidget/HistoryMinimap.cpp
+    qtermwidget/HistoryMinimap.cpp \
+    qtermwidget/MinimapWindow.cpp
 
 HEADERS  += mainwindow.h \
     bookmarkswidget.h \
@@ -100,7 +101,8 @@ HEADERS  += mainwindow.h \
     qtermwidget/StatusBar.h \
     docktabwidget.h \
     qtermwidget/MinimapNavigator.h \
-    qtermwidget/HistoryMinimap.h
+    qtermwidget/HistoryMinimap.h \
+    qtermwidget/MinimapWindow.h
 
 QMAKE_LFLAGS += '-Wl,-rpath=\'\$$ORIGIN\''
 

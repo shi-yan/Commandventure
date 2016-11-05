@@ -45,8 +45,6 @@
 #include "ShellCommand.h"
 #include "Vt102Emulation.h"
 
-using namespace Konsole;
-
 int Session::lastSessionId = 0;
 
 Session::Session(QObject* parent) :

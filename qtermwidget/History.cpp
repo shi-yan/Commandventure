@@ -40,8 +40,6 @@
 #define LINE_SIZE    1024
 #define KDE_lseek lseek
 
-using namespace Konsole;
-
 /*
    An arbitrary long scroll.
 

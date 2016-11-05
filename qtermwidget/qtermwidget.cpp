@@ -38,8 +38,6 @@
 
 #define STEP_ZOOM 1
 
-using namespace Konsole;
-
 void *createTermWidget(int startnow, void *parent)
 {
     return (void*) new QTermWidget(startnow, (QWidget*)parent);
@@ -586,7 +584,7 @@ void QTermWidget::setEnvironment(const QStringList& environment)
 
 void QTermWidget::setMotionAfterPasting(int action)
 {
-    m_impl->m_terminalDisplay->setMotionAfterPasting((Konsole::MotionAfterPasting) action);
+    m_impl->m_terminalDisplay->setMotionAfterPasting((MotionAfterPasting) action);
 }
 
 int QTermWidget::historyLinesCount()
@@ -672,7 +670,7 @@ QString QTermWidget::title() const
 {
     QString title = m_impl->m_session->userTitle();
     if (title.isEmpty())
-        title = m_impl->m_session->title(Konsole::Session::NameRole);
+        title = m_impl->m_session->title(Session::NameRole);
     return title;
 }
 

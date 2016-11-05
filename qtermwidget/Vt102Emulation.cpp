@@ -55,8 +55,6 @@
 #include "Screen.h"
 #include <QDebug>
 
-using namespace Konsole;
-
 Vt102Emulation::Vt102Emulation()
     : Emulation(),
      _titleUpdateTimer(new QTimer(this)),

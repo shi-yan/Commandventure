@@ -8,8 +8,6 @@
 #define BlockSize (1 << 12)
 #define ENTRIES   ((BlockSize - sizeof(size_t) ) / sizeof(unsigned char))
 
-namespace Konsole {
-
 struct Block {
     Block() {
         size = 0;
@@ -102,7 +100,5 @@ private:
     size_t length;
 
 };
-
-}
 
 #endif

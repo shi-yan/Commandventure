@@ -31,8 +31,6 @@ class QWidget;
 
 //class KMenu;
 
-namespace Konsole
-{
 
     enum MotionAfterPasting
     {
@@ -812,7 +810,5 @@ private:
     QWidget* widget() const { return static_cast<QWidget*>(parent()); }
     int _timerId;
 };
-
-}
 
 #endif // TERMINALDISPLAY_H

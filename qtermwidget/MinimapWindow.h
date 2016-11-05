@@ -28,7 +28,7 @@ class Screen;
  * be called.  This in turn will update the window's position and emit the outputChanged() signal
  * if necessary.
  */
-class ScreenWindow : public QObject
+class MinimapWindow : public QObject
 {
 Q_OBJECT
 
@@ -42,8 +42,8 @@ public:
      * to notify the window when the associated screen has changed and synchronize selection updates
      * between all views on a session.
      */
-    ScreenWindow(QObject* parent = 0);
-    virtual ~ScreenWindow();
+    MinimapWindow(QObject* parent = 0);
+    virtual ~MinimapWindow();
 
     /** Sets the screen which this window looks onto */
     void setScreen(Screen* screen);

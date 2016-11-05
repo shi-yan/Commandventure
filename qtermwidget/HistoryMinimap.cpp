@@ -5,7 +5,7 @@ HistoryMinimap::HistoryMinimap()
 
 }
 
-void HistoryMinimap::pushLine(QVector<Konsole::Character> &line)
+void HistoryMinimap::pushLine(QVector<Character> &line)
 {
 
 }

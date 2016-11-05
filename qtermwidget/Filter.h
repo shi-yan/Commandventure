@@ -11,9 +11,6 @@
 
 // Local
 
-namespace Konsole
-{
-
 class Character;
 struct LineProperty;
 
@@ -361,8 +358,6 @@ private:
     QList<int>* _linePositions;
 };
 
-}
-
-typedef Konsole::Filter Filter;
+typedef Filter Filter;
 
 #endif //FILTER_H

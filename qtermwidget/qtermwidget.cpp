@@ -53,15 +53,16 @@ struct TermWidgetImpl {
 
     Session* createSession(QWidget* parent);
     TerminalDisplay* createTerminalDisplay(Session *session, QScrollBar *scrollbar, QWidget* parent);
-    MinimapDisplay* createMinimapDisplay(Session *session, QWidget *parent);
+    MinimapDisplay* createMinimapDisplay(Session *session, TerminalDisplay *, QWidget *parent);
 };
 
 TermWidgetImpl::TermWidgetImpl(QScrollBar *scrollbar, QWidget* parent)
 {
     this->m_session = createSession(parent);
-    this->m_minimap = createMinimapDisplay(this->m_session, parent);
 
     this->m_terminalDisplay = createTerminalDisplay(this->m_session, scrollbar, parent);
+
+    this->m_minimap = createMinimapDisplay(this->m_session, this->m_terminalDisplay, parent);
 
 }
 
@@ -100,9 +101,9 @@ Session *TermWidgetImpl::createSession(QWidget* parent)
     return session;
 }
 
-MinimapDisplay *TermWidgetImpl::createMinimapDisplay(Session *session, QWidget *parent)
+MinimapDisplay *TermWidgetImpl::createMinimapDisplay(Session *session, TerminalDisplay *terminalDisplay, QWidget *parent)
 {
-        MinimapDisplay* display = new MinimapDisplay(parent);
+        MinimapDisplay* display = new MinimapDisplay(terminalDisplay, parent);
 
         display->setBellMode(TerminalDisplay::NotifyBell);
         display->setTerminalSizeHint(true);
@@ -354,6 +355,9 @@ void QTermWidget::setTerminalFont(const QFont &font)
     if (!m_impl->m_terminalDisplay)
         return;
     m_impl->m_terminalDisplay->setVTFont(font);
+    if (!m_impl->m_minimap)
+        return;
+    m_impl->m_minimap->setVTFont(font);
 }
 
 QFont QTermWidget::getTerminalFont()
@@ -460,6 +464,7 @@ void QTermWidget::setColorScheme(const QString& origName)
     ColorEntry table[TABLE_COLORS];
     cs->getColorTable(table);
     m_impl->m_terminalDisplay->setColorTable(table);
+    m_impl->m_minimap->setColorTable(table);
 }
 
 QStringList QTermWidget::availableColorSchemes()
@@ -480,6 +485,7 @@ void QTermWidget::setSize(const QSize &size)
     if (!m_impl->m_terminalDisplay)
         return;
     m_impl->m_terminalDisplay->setSize(size.width(), size.height());
+
 }
 
 void QTermWidget::setHistorySize(int lines)

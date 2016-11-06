@@ -28,6 +28,7 @@ class QShowEvent;
 class QHideEvent;
 class QTimerEvent;
 class QWidget;
+class MinimapDisplay;
 
 //class KMenu;
 
@@ -60,6 +61,7 @@ class KONSOLEPRIVATE_EXPORT TerminalDisplay : public QWidget
 {
    Q_OBJECT
 
+    friend class MinimapDisplay;
 public:
     /** Constructs a new terminal display widget with the specified parent. */
     TerminalDisplay(QScrollBar *scrollBar, QWidget *parent=0);
@@ -123,7 +125,7 @@ public:
      *      - Area of interest may be known ( eg. mouse cursor hovering
      *      over an area )
      */
-    void processFilters();
+    virtual void processFilters();
 
     /**
      * Returns a list of menu actions created by the filters for the content
@@ -585,7 +587,7 @@ private slots:
     void swapColorTable();
     void tripleClickTimeout();  // resets possibleTripleClick
 
-private:
+protected:
 
     // -- Drawing helpers --
 
@@ -641,9 +643,8 @@ private:
     // the left and right are ignored.
     void scrollImage(int lines , const QRect& region);
 
-    void calcGeometry();
+    virtual void calcGeometry();
     void propagateSize();
-    void updateImageSize();
     void makeImage();
 
     void paintFilters(QPainter& painter);
@@ -788,6 +789,8 @@ private:
 
     //MinimapNavigator *m_miniMap;
 
+protected:
+    virtual void updateImageSize();
 
 
 public:

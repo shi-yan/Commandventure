@@ -6,6 +6,7 @@
 #include <QPointer>
 #include <QWidget>
 #include <QPainter>
+#include <QPixmap>
 
 // Konsole
 #include "Filter.h"
@@ -42,10 +43,26 @@ class MinimapDisplay : public TerminalDisplay
 {
    Q_OBJECT
 
+private:
+    unsigned int _displayWidth;
+    unsigned int _displayHeight;
+
+    TerminalDisplay *_terminalDisplay;
+
+    QPixmap m_cachedPixmap;
+
+
 public:
     /** Constructs a new terminal display widget with the specified parent. */
-    MinimapDisplay(QWidget *parent=0);
+    MinimapDisplay(TerminalDisplay *terminalDisplay, QWidget *parent=0);
     virtual ~MinimapDisplay();
+
+    virtual void paintEvent( QPaintEvent* pe );
+
+protected:
+    virtual void calcGeometry();
+
+
 
 };
 

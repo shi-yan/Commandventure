@@ -2929,6 +2929,8 @@ void TerminalDisplay::calcGeometry()
   _topMargin = DEFAULT_TOP_MARGIN;
   _contentHeight = contentsRect().height() - 2 * DEFAULT_TOP_MARGIN + /* mysterious */ 1;
 
+  qDebug() << "terminal display size:" << _contentWidth << _contentHeight;
+
   if (!_isFixedSize)
   {
      // ensure that display is always at least one column wide

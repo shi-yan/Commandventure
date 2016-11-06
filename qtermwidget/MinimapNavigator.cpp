@@ -42,7 +42,7 @@ void MinimapNavigator::paintEvent(QPaintEvent *e)
         qDebug() << sdestRect;
 
         QPixmap shrink = m_historyScreenCachedImage.scaled(sdestRect.size(),Qt::KeepAspectRatio,Qt::SmoothTransformation);
-        shrink.save("debug.png");
+        //shrink.save("debug.png");
 
 
 

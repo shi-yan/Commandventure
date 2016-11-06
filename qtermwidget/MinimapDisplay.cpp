@@ -64,14 +64,99 @@
 #include "TerminalCharacterDecoder.h"
 
 
-MinimapDisplay::MinimapDisplay(QWidget *parent)
-:TerminalDisplay(NULL, parent)
+MinimapDisplay::MinimapDisplay(TerminalDisplay *terminalDisplay, QWidget *parent)
+:TerminalDisplay(NULL, parent), _terminalDisplay(terminalDisplay)
 {
 
 }
 
 MinimapDisplay::~MinimapDisplay()
 {
+
+}
+
+void MinimapDisplay::calcGeometry()
+{
+    _terminalDisplay->calcGeometry();
+  _leftMargin = DEFAULT_LEFT_MARGIN;
+  _displayWidth = contentsRect().width()  - 2 * DEFAULT_LEFT_MARGIN;
+
+
+  _topMargin = DEFAULT_TOP_MARGIN;
+  _displayHeight = contentsRect().height() - 2 * DEFAULT_TOP_MARGIN + /* mysterious */ 1;
+
+  _contentWidth = _terminalDisplay->_contentWidth;
+
+  float ratio = (float) _terminalDisplay->_contentWidth / (float) _displayWidth;
+
+  _contentHeight = ratio * _displayHeight;
+
+  qDebug() <<"minimap display:"<< _contentWidth << _contentHeight;
+
+  if (!_isFixedSize)
+  {
+     // ensure that display is always at least one column wide
+     _columns = qMax(1,_contentWidth / _fontWidth);
+     _usedColumns = qMin(_usedColumns,_columns);
+
+     // ensure that display is always at least one line high
+     _lines = qMax(1,_contentHeight / _fontHeight);
+     _usedLines = qMin(_usedLines,_lines);
+  }
+
+  if (m_cachedPixmap.width() != _contentWidth || m_cachedPixmap.height() != _contentHeight)
+  {
+      qDebug() << m_cachedPixmap.width() << m_cachedPixmap.height();
+      m_cachedPixmap = QPixmap(_contentWidth, _contentHeight);
+  }
+}
+
+void MinimapDisplay::paintEvent( QPaintEvent* pe )
+{
+    //QPainter painter(this);
+
+    QPainter cachedImagePainter(&m_cachedPixmap);
+    cachedImagePainter.setFont(font());
+
+    QRect rect2(0,0, this->_contentWidth, this->_contentHeight);
+
+  QVector<QRect> updateRects =  (pe->region() & rect2).rects();
+
+  foreach (const QRect &rect, updateRects)
+  {
+    drawBackground(cachedImagePainter,rect,QColor(48,51,61),
+                    true /* use opacity setting */);
+
+
+
+    drawContents(cachedImagePainter, rect);
+    /*paint.setPen(QColor(Qt::red));
+    paint.drawRect(rect);*/
+    qDebug() << "repaint rect" << rect;
+  }
+  //drawInputMethodPreeditString(cachedImagePainter,preeditRect());
+  //paintFilters(cachedImagePainter);
+
+  //QPainter paintWidget(this);
+  //m_cachedPixmap.save("test2.png");
+
+/*  foreach (const QRect &rect, updateRects)
+  {
+      paintWidget.drawPixmap(rect, *m_miniMap->getCurrentScreenCachedImage(), rect);
+  }
+*/
+ // paintWidget.drawPixmap(preeditRect(), *m_miniMap->getCurrentScreenCachedImage(), preeditRect());
+
+  //m_miniMap->update();
+
+
+  QPainter painter(this);
+
+  QRect sdestRect(0,0,contentsRect().width(),  m_cachedPixmap.height() * (float)contentsRect().width() / (float) m_cachedPixmap.width());
+
+  QPixmap shrink = m_cachedPixmap.scaled(sdestRect.size(),Qt::KeepAspectRatio);
+
+  painter.drawPixmap(sdestRect, shrink, shrink.rect());
 
 }
 

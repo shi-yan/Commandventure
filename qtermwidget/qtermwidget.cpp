@@ -35,6 +35,7 @@
 #include "qtermwidget.h"
 #include <QProcess>
 #include <QScrollBar>
+#include "MinimapDisplay.h"
 
 #define STEP_ZOOM 1
 
@@ -52,12 +53,13 @@ struct TermWidgetImpl {
 
     Session* createSession(QWidget* parent);
     TerminalDisplay* createTerminalDisplay(Session *session, QScrollBar *scrollbar, QWidget* parent);
+    MinimapDisplay* createMinimapDisplay(Session *session, QWidget *parent);
 };
 
 TermWidgetImpl::TermWidgetImpl(QScrollBar *scrollbar, QWidget* parent)
 {
     this->m_session = createSession(parent);
-    this->m_minimap = createTerminalDisplay(this->m_session, NULL, parent);
+    this->m_minimap = createMinimapDisplay(this->m_session, parent);
 
     this->m_terminalDisplay = createTerminalDisplay(this->m_session, scrollbar, parent);
 
@@ -96,6 +98,18 @@ Session *TermWidgetImpl::createSession(QWidget* parent)
 
     session->setKeyBindings("");
     return session;
+}
+
+MinimapDisplay *TermWidgetImpl::createMinimapDisplay(Session *session, QWidget *parent)
+{
+        MinimapDisplay* display = new MinimapDisplay(parent);
+
+        display->setBellMode(TerminalDisplay::NotifyBell);
+        display->setTerminalSizeHint(true);
+        display->setTripleClickMode(TerminalDisplay::SelectWholeLine);
+        display->setTerminalSizeStartup(true);
+        display->setRandomSeed(session->sessionId() * 31);
+        return display;
 }
 
 TerminalDisplay *TermWidgetImpl::createTerminalDisplay(Session *session, QScrollBar *scrollbar, QWidget* parent)

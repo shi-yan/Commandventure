@@ -67,6 +67,7 @@
 MinimapDisplay::MinimapDisplay(TerminalDisplay *terminalDisplay, QWidget *parent)
 :TerminalDisplay(NULL, parent), _terminalDisplay(terminalDisplay)
 {
+    setAutoFillBackground(true);
 
 }
 
@@ -113,27 +114,32 @@ void MinimapDisplay::calcGeometry()
 
 void MinimapDisplay::paintEvent( QPaintEvent* pe )
 {
+    QPainter painter(this);
+
+    painter.fillRect(pe->rect(), Qt::black);
+
+
     //QPainter painter(this);
 
-    QPainter cachedImagePainter(&m_cachedPixmap);
+  /*  QPainter cachedImagePainter(&m_cachedPixmap);
     cachedImagePainter.setFont(font());
 
-    QRect rect2(0,0, this->_contentWidth, this->_contentHeight);
+    QRect rect(0,0, this->_contentWidth, this->_contentHeight);
+*/
+ // QVector<QRect> updateRects =  (pe->region() & rect2).rects();
 
-  QVector<QRect> updateRects =  (pe->region() & rect2).rects();
-
-  foreach (const QRect &rect, updateRects)
-  {
+  //foreach (const QRect &rect, updateRects)
+/*  {
     drawBackground(cachedImagePainter,rect,QColor(48,51,61),
-                    true /* use opacity setting */);
+                    true );
 
 
 
     drawContents(cachedImagePainter, rect);
-    /*paint.setPen(QColor(Qt::red));
-    paint.drawRect(rect);*/
+
     qDebug() << "repaint rect" << rect;
   }
+*/
   //drawInputMethodPreeditString(cachedImagePainter,preeditRect());
   //paintFilters(cachedImagePainter);
 
@@ -149,14 +155,14 @@ void MinimapDisplay::paintEvent( QPaintEvent* pe )
 
   //m_miniMap->update();
 
-
+/*
   QPainter painter(this);
 
   QRect sdestRect(0,0,contentsRect().width(),  m_cachedPixmap.height() * (float)contentsRect().width() / (float) m_cachedPixmap.width());
 
-  QPixmap shrink = m_cachedPixmap.scaled(sdestRect.size(),Qt::KeepAspectRatio);
+  QPixmap shrink = m_cachedPixmap.scaled(sdestRect.size(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-  painter.drawPixmap(sdestRect, shrink, shrink.rect());
+  painter.drawPixmap(sdestRect, shrink, shrink.rect());*/
 
 }
 
